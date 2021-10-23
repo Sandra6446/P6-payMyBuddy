@@ -1,26 +1,40 @@
 <template>
-  <div class="row justify-content-center my-3">
-    <div class="col-10 col-md-8">
-      <div class="input-group input-group-lg">
-        <span class="input-group-text bg-transparent">
-          <img
-            src="../assets/asterisk.svg"
-            class="img-asterisk"
-            alt="asterisk image"
-          />
-        </span>
-        <input
-          class="form-control border-start-0"
-          @input="emitCustomEvent"
-          v-bind:value="value"
-          type="password"
-          v-bind:id="id"
-          v-bind:placeholder="placeholder"
-          v-bind:aria-label="placeholder"
-          required
-        />
-      </div>
-    </div>
+  <div v-if="passwordRequired" class="input-group input-group-lg mb-3">
+    <span class="input-group-text bg-white">
+      <img
+        src="../assets/asterisk.svg"
+        class="img-asterisk"
+        alt="asterisk image"
+      />
+    </span>
+    <input
+      class="form-control border-start-0"
+      @input="emitCustomEvent"
+      v-bind:value="value"
+      type="password"
+      v-bind:id="id"
+      v-bind:placeholder="placeholder"
+      v-bind:aria-label="placeholder"
+      required
+    />
+  </div>
+  <div v-else class="input-group input-group-lg mb-3">
+    <span class="input-group-text bg-white">
+      <img
+        src="../assets/asterisk.svg"
+        class="img-asterisk"
+        alt="asterisk image"
+      />
+    </span>
+    <input
+      class="form-control border-start-0"
+      @input="emitCustomEvent"
+      v-bind:value="value"
+      type="password"
+      v-bind:id="id"
+      v-bind:placeholder="placeholder"
+      v-bind:aria-label="placeholder"
+    />
   </div>
 </template>
 
@@ -39,6 +53,9 @@ export default {
       type: String,
       required: true,
     },
+    passwordRequired: {
+      type:Boolean
+    }
   },
   methods: {
     emitCustomEvent() {

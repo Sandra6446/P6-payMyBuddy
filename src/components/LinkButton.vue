@@ -1,26 +1,32 @@
 <template>
-    <button type="button" class="btn btn-link">
-        <router-link size="lg" v-bind:to="page"> {{lib}} </router-link>
+  <button type="button" class="btn btn-link">
+    <button type="button" class="btn btn-link" @click="goBack">
+      {{ lib }}
     </button>
+  </button>
 </template>
 
 <script>
-    export default {
-        name: 'LinkButton',
-        props: {
-            lib: {
-                type: String
-            },
-            page: {
-                type: String
-            }
-        }
-    }
+export default {
+  name: "LinkButton",
+  props: {
+    lib: {
+      type: String,
+    },
+    page: {
+      type: String,
+    },
+  },
+  methods: {
+    goBack() {
+      this.$router.go();
+    },
+  },
+};
 </script>
 
-<style>
-    a {
-      color: black;
-      text-decoration: underline;
-    }
+<style scoped>
+.btn-link {
+    color: black;
+}
 </style>

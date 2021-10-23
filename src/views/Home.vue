@@ -1,8 +1,15 @@
 <template>
   <div class="container-fluid" id="home">
+    
     <Header></Header>
 
-    <div class="col col-8 mx-auto">
+    <nav aria-label="breadcrumb" class="bg-light">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">Home</li>
+      </ol>
+    </nav>
+
+    <div class="col col-10 mx-auto">
       <div class="row justify-content-md-center my-5">
         <h1>Welcome {{ name }}</h1>
       </div>
@@ -13,36 +20,40 @@
         </div>
       </div>
 
-      <b-table
+      <table
         id="last_transactions"
-        striped
-        caption-top
-        class="text-center"
-        :items="items"
-        :current-page="currentPage"
-        :per-page="perPage"
+        class="table text-center table-striped caption-top"
       >
-        <template #table-caption>Last transactions</template>
-      </b-table>
+        <caption>
+          Last transactions
+        </caption>
 
-      <b-pagination
-        align="center"
-        v-model="currentPage"
-        :total-rows="totalRows"
-        :per-page="perPage"
-        aria-controls="last_transactions"
-      ></b-pagination>
+        <thead>
+          <tr>
+            <th scope="col">Connection</th>
+            <th scope="col">Description</th>
+            <th scope="col">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in items" v-bind:key="item.id">
+            <td>{{ item.connection }}</td>
+            <td>{{ item.description }}</td>
+            <td>{{ item.amount }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </template>
 
  <script>
-import Header from "../components/Header.vue";
+import Header from '../components/Header.vue';
 
 export default {
   name: "Home",
   components: {
-    Header,
+    Header
   },
   data() {
     return {
@@ -50,26 +61,31 @@ export default {
       balance: 20,
       items: [
         {
+          id: 1,
           connection: "Hayley",
           description: "Jane's gift",
           amount: "20€",
         },
         {
+          id: 2,
           connection: "Hayley",
           description: "Restaurant bill share",
           amount: "-10€",
         },
         {
+          id: 3,
           connection: "Clara",
           description: "Trip money",
           amount: "-25€",
         },
         {
+          id: 4,
           connection: "Smith",
           description: "Movie tickets",
           amount: "-8€",
         },
         {
+          id: 5,
           connection: "Clara",
           description: "Movie tickets",
           amount: "8€",
@@ -79,10 +95,6 @@ export default {
       totalRows: 1,
       currentPage: 1,
     };
-  },
-  mounted() {
-    // Set the initial number of items
-    this.totalRows = this.items.length;
   },
 };
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <button type="submit" class="btn btn-primary btn-block">{{ lib }}</button>
+  <button type="submit" class="btn btn-primary col-12">{{ lib }}</button>
 </template>
 
 <script>

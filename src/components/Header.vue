@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <nav class="navbar navbar-expand-lg">
+  <div class="container-fluid"> 
+    <nav class="navbar navbar-expand-lg navbar-light">
       <div class="container-fluid">
         <span class="navbar-brand"><MainTitle></MainTitle></span>
         <button
@@ -14,29 +14,18 @@
         >
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarHeader">
-          <div class="navbar-nav">
-            <a class="nav-link active" aria-current="page" href="#/home">Home</a>
-
-            <a class="nav-link" href="#/transfer">Transfer</a>
-
-            <a class="nav-link" href="#/profile">Profile</a>
-
-            <a class="nav-link" href="#/contact">Contact</a>
-
-            <a class="nav-link" href="#/">Log off</a>
+        <div class="col-auto me-5 d-flex">
+          <div class="collapse navbar-collapse" id="navbarHeader">
+            <div class="navbar-nav">
+              <router-link class="nav-link" to="/home">Home</router-link>
+              <router-link class="nav-link" to="/transfer">Transfer</router-link>
+              <router-link class="nav-link" to="/profile">Profile</router-link>
+              <router-link class="nav-link" to="/contact">Contact</router-link>
+              <router-link class="nav-link" to="/">Log off</router-link>
+            </div>
           </div>
         </div>
       </div>
-    </nav>
-
-    <nav class="bg-light" aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="#/home">Home</a></li>
-        <li class="breadcrumb-item active" aria-current="page">
-          {{ currentPage }}
-        </li>
-      </ol>
     </nav>
   </div>
 </template>
@@ -48,11 +37,16 @@ export default {
   name: "Header",
   components: {
     MainTitle,
-  },
-  props: {
-    currentPage: {
-      type: String,
-    },
-  },
+  }
 };
 </script>
+
+<style scoped>
+.nav-link {
+  color: gray;
+}
+
+.nav-link .active {
+  color: rgb(0, 102, 255);
+}
+</style>

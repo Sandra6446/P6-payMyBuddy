@@ -1,0 +1,42 @@
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #595d61;
+}
+
+.main-card {
+  width: 75vw;
+  min-height: 90vh;
+  margin: auto;
+  margin-top: 5vh;
+  padding-top: 10vh;
+}
+
+.breadcrumb-item a active {
+  color: gray;
+  text-decoration: none;
+}
+
+.breadcrumb-item a {
+  color: rgb(0, 102, 255);
+  text-decoration: none;
+}
+
+a.nav-link.router-link-exact-active.router-link-active {
+  color: rgb(0, 102, 255);
+}
+
+a.nav-link.router-link-exact-active.router-link-active:focus {
+  color: rgb(0, 102, 255);
+}
+
+thead {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-link {
+  color: black;
+}
