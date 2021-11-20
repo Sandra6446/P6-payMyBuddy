@@ -23,9 +23,14 @@ public class LoginService {
     @Autowired
     private UserEntityRepository userEntityRepository;
 
-    public ResponseEntity checkLogin(Login login) {
+    private boolean authorized = false;
+
+    public ResponseEntity<String> checkLogin(Login login) {
         Optional<UserEntity> userEntityOptional = userEntityRepository.findById(login.getEmail());
-        if (userEntityOptional.isPresent() && userEntityOptional.get().getPassword().equals(login.getPassword())) {
+
+        userEntityOptional.ifPresent(userEntity -> authorized = (userEntity.getPassword().equals(login.getPassword())));
+
+        if (authorized) {
             logger.info("User " + login.getEmail() + " found in database.");
             return ResponseEntity.ok("User " + login.getEmail() + " authorized.");
         } else {

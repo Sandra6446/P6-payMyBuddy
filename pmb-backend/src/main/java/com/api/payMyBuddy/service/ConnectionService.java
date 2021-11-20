@@ -1,11 +1,11 @@
 package com.api.payMyBuddy.service;
 
-import com.api.payMyBuddy.controller.UserController;
-import com.api.payMyBuddy.model.entity.NetworkEntity;
+import com.api.payMyBuddy.model.entity.ConnectionEntity;
 import com.api.payMyBuddy.model.entity.UserEntity;
+import com.api.payMyBuddy.model.front.User;
 import com.api.payMyBuddy.model.repository.ConnectionEntityRepository;
 import com.api.payMyBuddy.model.repository.UserEntityRepository;
-import com.api.payMyBuddy.service.mapper.MapperConnection;
+import com.api.payMyBuddy.model.requestBody.ConnectionBody;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import java.util.Optional;
 @Service
 public class ConnectionService {
 
-    private static final Logger logger = LogManager.getLogger(UserController.class);
+    private static final Logger logger = LogManager.getLogger(ConnectionService.class);
 
     @Autowired
     private UserEntityRepository userEntityRepository;
@@ -26,32 +26,46 @@ public class ConnectionService {
     @Autowired
     private ConnectionEntityRepository connectionEntityRepository;
 
-    @Autowired
-    private MapperConnection mapperConnection;
-
-    public ResponseEntity<Object> createConnectionEntity(String userEmail, String connectionEmail) {
-        Optional<UserEntity> userEntityOptional = userEntityRepository.findById(userEmail);
+    public ResponseEntity<String> createConnection(ConnectionBody connectionBody) {
+        String message = "";
+        Optional<UserEntity> userEntityOptional = userEntityRepository.findById(connectionBody.getUserEmail());
         if (userEntityOptional.isEmpty()) {
-            logger.error("User not found");
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+            message = "User not found";
+            logger.error(message);
+            return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
         } else {
             UserEntity userEntity = userEntityOptional.get();
-            Optional<UserEntity> connectionOptional = userEntityRepository.findById(connectionEmail);
-            if (connectionOptional.isEmpty()) {
-                logger.error("User not found");
-                return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+            Optional<UserEntity> userEntityConnectionOptional = userEntityRepository.findById(connectionBody.getConnectionEmail());
+            if (userEntityConnectionOptional.isEmpty()) {
+                message = "Connection not found";
+                logger.error(message);
+                return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
             } else {
-                UserEntity connection = connectionOptional.get();
-                if (mapperConnection.getConnections(userEntity).contains(connection)) {
-                    logger.error("Connection already registered");
-                    return new ResponseEntity<>("Connection already registered", HttpStatus.CONFLICT);
+                UserEntity userEntityConnection = userEntityConnectionOptional.get();
+                ConnectionEntity connectionEntity = new ConnectionEntity(userEntity, userEntityConnection);
+                if (userEntity.getConnectionEntities().contains(connectionEntity)) {
+                    message = "Connection already registered";
+                    logger.error(message);
+                    return new ResponseEntity<>(message, HttpStatus.CONFLICT);
                 } else {
-                    NetworkEntity networkEntity = new NetworkEntity(userEntity,connection);
-                    connectionEntityRepository.saveAndFlush(networkEntity);
-                    return new ResponseEntity<>("Connection " + connectionEmail + " added for " + userEmail, HttpStatus.CREATED);
+                    connectionEntityRepository.saveAndFlush(connectionEntity);
+                    message = "Connection " + userEntityConnection.getEmail() + " added for " + userEntity.getEmail();
+                    logger.info(message);
+                    return new ResponseEntity<>(message, HttpStatus.CREATED);
                 }
             }
         }
     }
 
+    public ResponseEntity<Object> getConnections(String userEmail) {
+        Optional<UserEntity> userEntityOptional = userEntityRepository.findById(userEmail);
+        if (userEntityOptional.isEmpty()) {
+            String message = "User not found";
+            logger.error(message);
+            return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+        } else {
+            User user = new User(userEntityOptional.get());
+            return ResponseEntity.ok(user.getConnections());
+        }
+    }
 }
