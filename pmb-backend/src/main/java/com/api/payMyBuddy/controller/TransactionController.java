@@ -1,6 +1,7 @@
 package com.api.payMyBuddy.controller;
 
-import com.api.payMyBuddy.service.ConnectionService;
+import com.api.payMyBuddy.model.requestBody.TransactionBody;
+import com.api.payMyBuddy.service.TransactionService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,31 +10,41 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/connection")
+@RequestMapping("/transaction")
 @RequiredArgsConstructor
-public class ConnectionController {
+public class TransactionController extends ValidationClass {
 
     @Autowired
-    private final ConnectionService connectionService;
+    private final TransactionService transactionService;
 
-    //-- A revoir
-    @ApiOperation("Adds connection in database")
-    @PostMapping
-    public ResponseEntity<Object> addConnection(@RequestParam("user_email") String user_email, @RequestParam("connection_email") String connection_email) {
-        if (user_email.isEmpty() || connection_email.isEmpty()) {
-            return new ResponseEntity<>("Error in request params", HttpStatus.BAD_REQUEST);
-        } else {
-            return connectionService.createConnection(user_email, connection_email);
-        }
-    }
-
-    @ApiOperation("Gets connections of a user")
+    @ApiOperation("Gets transactions made by a user")
     @GetMapping("/{email}")
-    public ResponseEntity<Object> getConnections(@PathVariable String email) {
-        if (email.isEmpty()) {
+    public ResponseEntity<Object> getAllTransactions(@PathVariable String email) {
+        if (isEmpty(email)) {
             return new ResponseEntity<>("Error in request body", HttpStatus.BAD_REQUEST);
         } else {
-            return connectionService.getConnections(email);
+            return transactionService.getAllTransactions(email);
         }
     }
+
+    @ApiOperation("Gets transactions made by a user")
+    @GetMapping("/{email}/myTransactions")
+    public ResponseEntity<Object> getTransactions(@PathVariable String email) {
+        if (isEmpty(email)) {
+            return new ResponseEntity<>("Error in request body", HttpStatus.BAD_REQUEST);
+        } else {
+            return transactionService.getMyTransactions(email);
+        }
+    }
+
+    @ApiOperation("Adds a transaction for a user")
+    @PostMapping
+    public ResponseEntity<String> addTransaction(@RequestBody TransactionBody transactionBody) {
+        if (isNotValid(transactionBody)) {
+            return new ResponseEntity<>("Error in request body", HttpStatus.BAD_REQUEST);
+        } else {
+            return transactionService.createTransaction(transactionBody);
+        }
+    }
+
 }

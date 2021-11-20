@@ -9,9 +9,9 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.util.Set;
 
-public abstract class ControlClass {
+public abstract class ValidationClass {
 
-    private static final Logger logger = LogManager.getLogger(ControlClass.class);
+    private static final Logger logger = LogManager.getLogger(ValidationClass.class);
     private static final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     private static final Validator validator = factory.getValidator();
 
