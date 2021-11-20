@@ -2,6 +2,7 @@ package com.api.payMyBuddy.model.entity;
 
 import com.api.payMyBuddy.model.front.User;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.DynamicUpdate;
@@ -15,6 +16,7 @@ import java.util.List;
 @Table(name = "utilisateur")
 @Getter
 @Setter
+@NoArgsConstructor
 @ToString
 @DynamicUpdate
 public class UserEntity {
@@ -42,16 +44,14 @@ public class UserEntity {
 
     private String bic;
 
-    @OneToMany(mappedBy = "networkPrimaryKey.user")
-    private List<NetworkEntity> networkEntities;
+    @OneToMany(mappedBy = "connectionPrimaryKey.userEntity")
+    private List<ConnectionEntity> connectionEntities = new ArrayList<>();
 
-    @OneToMany(mappedBy = "transferPrimaryKey.user")
-    private List<TransferEntity> transferEntities;
+    @OneToMany(mappedBy = "transferPrimaryKey.userEntity")
+    private List<TransactionEntity> debits = new ArrayList<>();
 
-    public UserEntity() {
-        this.setNetworkEntities(new ArrayList<>());
-        this.setTransferEntities(new ArrayList<>());
-    }
+    @OneToMany(mappedBy = "transferPrimaryKey.userEntityConnection")
+    private List<TransactionEntity> credits = new ArrayList<>();
 
     public UserEntity(User user) {
         this.setEmail(user.getEmail());

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Getter
@@ -14,11 +15,14 @@ import javax.validation.constraints.NotNull;
 public class BankAccount {
 
     @NotNull
+    @NotEmpty
     private String bank;
 
     @NotNull
+    @NotEmpty
     private String iban;
 
     @NotNull
+    @NotEmpty
     private String bic;
 }

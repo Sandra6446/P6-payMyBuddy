@@ -15,15 +15,15 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
-public class TransferPrimaryKey implements Serializable {
+public class TransactionPrimaryKey implements Serializable {
 
     @ManyToOne
     @JoinColumn(name="utilisateur_email")
-    private UserEntity user;
+    private UserEntity userEntity;
 
     @ManyToOne
     @JoinColumn(name="destinataire_email")
-    private UserEntity connection;
+    private UserEntity userEntityConnection;
 
     @Column
     private Date date;
