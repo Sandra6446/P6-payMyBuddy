@@ -1,8 +1,6 @@
 package com.api.payMyBuddy.model.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -12,7 +10,9 @@ import javax.persistence.Table;
 @Table(name="reseau")
 @Getter
 @Setter
+@EqualsAndHashCode
 @NoArgsConstructor
+@AllArgsConstructor
 public class ConnectionEntity {
 
     @EmbeddedId
@@ -24,4 +24,5 @@ public class ConnectionEntity {
         primaryKey.setUserEntityConnection(userEntityConnection);
         this.setConnectionPrimaryKey(primaryKey);
     }
+
 }

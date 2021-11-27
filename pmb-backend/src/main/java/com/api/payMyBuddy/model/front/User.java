@@ -3,10 +3,12 @@ package com.api.payMyBuddy.model.front;
 import com.api.payMyBuddy.model.entity.ConnectionEntity;
 import com.api.payMyBuddy.model.entity.TransactionEntity;
 import com.api.payMyBuddy.model.entity.UserEntity;
-import com.fasterxml.jackson.annotation.JsonFilter;
+import com.api.payMyBuddy.model.requestBody.UserProfile;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.SneakyThrows;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -18,7 +20,6 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@JsonFilter("userFilter")
 public class User extends Login {
 
     @NotNull
@@ -29,8 +30,7 @@ public class User extends Login {
     @NotEmpty
     private String lastName;
 
-    @NotNull
-    private float balance;
+    private double balance;
 
     @NotNull
     @Valid
@@ -81,4 +81,29 @@ public class User extends Login {
         this.setConnections(connections);
     }
 
+    public User(@NotNull @NotEmpty String email, @NotNull @NotEmpty String password, String confirmPassword, String firstName, String lastName, double balance, BankAccount bankAccount, List<Connection> connections, List<Transaction> debits, List<Transaction> credits) {
+        super(email, password, confirmPassword);
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.balance = balance;
+        this.bankAccount = bankAccount;
+        this.connections = connections;
+        this.debits = debits;
+        this.credits = credits;
+    }
+
+    public User(UserProfile userProfile) {
+        super (userProfile.getEmail(),userProfile.getPassword(),null);
+        this.firstName = userProfile.getFirstName();
+        this.lastName = userProfile.getLastName();
+        BankAccount bankAccount = new BankAccount(userProfile.getBankAccount().getBank(),userProfile.getBankAccount().getIban(),userProfile.getBankAccount().getBic());
+        this.bankAccount = bankAccount;
+    }
+
+    @SneakyThrows
+    @Override
+    public String toString() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(this);
+    }
 }

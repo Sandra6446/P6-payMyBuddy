@@ -9,7 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name="transfert")
@@ -28,7 +28,7 @@ public class TransactionEntity {
     private String description;
 
     @Column(name="date_prelevement")
-    private Date debitDate;
+    private LocalDateTime debitDate;
 
     @Column(name="facture_id")
     private String bill;
@@ -37,7 +37,7 @@ public class TransactionEntity {
         TransactionPrimaryKey primaryKey = new TransactionPrimaryKey();
         primaryKey.setUserEntity(userEntity);
         primaryKey.setUserEntityConnection(userEntityConnection);
-        primaryKey.setDate(transactionBody.getDate());
+        primaryKey.setDate(LocalDateTime.now());
         this.setTransferPrimaryKey(primaryKey);
         this.setAmount(transactionBody.getAmount());
         this.setDescription(transactionBody.getDescription());

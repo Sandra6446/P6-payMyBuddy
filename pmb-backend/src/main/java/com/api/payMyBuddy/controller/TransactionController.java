@@ -42,6 +42,8 @@ public class TransactionController extends ValidationClass {
     public ResponseEntity<String> addTransaction(@RequestBody TransactionBody transactionBody) {
         if (isNotValid(transactionBody)) {
             return new ResponseEntity<>("Error in request body", HttpStatus.BAD_REQUEST);
+        } else if (transactionBody.getUserEmail().equals(transactionBody.getConnectionEmail())) {
+            return new ResponseEntity<>("Emails have to be different", HttpStatus.BAD_REQUEST);
         } else {
             return transactionService.createTransaction(transactionBody);
         }

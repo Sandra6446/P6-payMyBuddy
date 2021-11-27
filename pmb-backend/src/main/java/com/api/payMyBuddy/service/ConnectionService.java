@@ -6,6 +6,7 @@ import com.api.payMyBuddy.model.front.User;
 import com.api.payMyBuddy.model.repository.ConnectionEntityRepository;
 import com.api.payMyBuddy.model.repository.UserEntityRepository;
 import com.api.payMyBuddy.model.requestBody.ConnectionBody;
+import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class ConnectionService {
 
     private static final Logger logger = LogManager.getLogger(ConnectionService.class);
@@ -28,14 +30,14 @@ public class ConnectionService {
 
     public ResponseEntity<String> createConnection(ConnectionBody connectionBody) {
         String message = "";
-        Optional<UserEntity> userEntityOptional = userEntityRepository.findById(connectionBody.getUserEmail());
+        Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(connectionBody.getUserEmail());
         if (userEntityOptional.isEmpty()) {
             message = "User not found";
             logger.error(message);
             return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
         } else {
             UserEntity userEntity = userEntityOptional.get();
-            Optional<UserEntity> userEntityConnectionOptional = userEntityRepository.findById(connectionBody.getConnectionEmail());
+            Optional<UserEntity> userEntityConnectionOptional = userEntityRepository.findByEmail(connectionBody.getConnectionEmail());
             if (userEntityConnectionOptional.isEmpty()) {
                 message = "Connection not found";
                 logger.error(message);
@@ -49,7 +51,7 @@ public class ConnectionService {
                     return new ResponseEntity<>(message, HttpStatus.CONFLICT);
                 } else {
                     connectionEntityRepository.saveAndFlush(connectionEntity);
-                    message = "Connection " + userEntityConnection.getEmail() + " added for " + userEntity.getEmail();
+                    message = "Connection " + connectionBody.getConnectionEmail() + " added for " + connectionBody.getUserEmail();
                     logger.info(message);
                     return new ResponseEntity<>(message, HttpStatus.CREATED);
                 }
@@ -58,14 +60,15 @@ public class ConnectionService {
     }
 
     public ResponseEntity<Object> getConnections(String userEmail) {
-        Optional<UserEntity> userEntityOptional = userEntityRepository.findById(userEmail);
+        Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(userEmail);
         if (userEntityOptional.isEmpty()) {
             String message = "User not found";
             logger.error(message);
             return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
         } else {
             User user = new User(userEntityOptional.get());
-            return ResponseEntity.ok(user.getConnections());
+            String connections = "{\"connections\": "+user.getConnections()+"}";
+            return ResponseEntity.ok(connections);
         }
     }
 }

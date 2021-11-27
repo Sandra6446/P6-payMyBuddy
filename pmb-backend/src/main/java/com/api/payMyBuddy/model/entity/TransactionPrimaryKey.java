@@ -4,12 +4,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Embeddable
 @Getter
@@ -17,15 +14,23 @@ import java.util.Date;
 @NoArgsConstructor
 public class TransactionPrimaryKey implements Serializable {
 
-    @ManyToOne
+    @ManyToOne(
+            cascade = {
+                    CascadeType.MERGE
+            }
+    )
     @JoinColumn(name="utilisateur_email")
     private UserEntity userEntity;
 
-    @ManyToOne
+    @ManyToOne(
+            cascade = {
+                    CascadeType.MERGE
+            }
+    )
     @JoinColumn(name="destinataire_email")
     private UserEntity userEntityConnection;
 
     @Column
-    private Date date;
+    private LocalDateTime date;
 
 }

@@ -39,7 +39,7 @@ public class TransactionService {
 
     public ResponseEntity<Object> getMyTransactions(String user_email) {
         String message = "";
-        Optional<UserEntity> userEntityOptional = userEntityRepository.findById(user_email);
+        Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(user_email);
         if (userEntityOptional.isEmpty()) {
             message = "User not found";
             logger.error(message);
@@ -56,7 +56,7 @@ public class TransactionService {
 
     public ResponseEntity<Object> getAllTransactions(String user_email) {
         String message = "";
-        Optional<UserEntity> userEntityOptional = userEntityRepository.findById(user_email);
+        Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(user_email);
         if (userEntityOptional.isEmpty()) {
             message = "User not found";
             logger.error(message);
@@ -69,14 +69,14 @@ public class TransactionService {
 
     public ResponseEntity<String> createTransaction(TransactionBody transactionBody) {
         String message = "";
-        Optional<UserEntity> userEntityOptional = userEntityRepository.findById(transactionBody.getUserEmail());
+        Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(transactionBody.getUserEmail());
         if (userEntityOptional.isEmpty()) {
             message = "User not found";
             logger.error(message);
             return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
         } else {
             UserEntity userEntity = userEntityOptional.get();
-            Optional<UserEntity> userEntityConnectionOptional = userEntityRepository.findById(transactionBody.getConnectionEmail());
+            Optional<UserEntity> userEntityConnectionOptional = userEntityRepository.findByEmail(transactionBody.getConnectionEmail());
             if (userEntityConnectionOptional.isEmpty()) {
                 message = "Connection not found";
                 logger.error(message);

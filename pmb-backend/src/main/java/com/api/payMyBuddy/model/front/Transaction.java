@@ -1,17 +1,19 @@
 package com.api.payMyBuddy.model.front;
 
 import com.api.payMyBuddy.model.entity.TransactionEntity;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class Transaction {
 
     @NotNull
@@ -26,18 +28,22 @@ public class Transaction {
     Integer amount;
 
     @NotNull
-    Date date;
+    LocalDateTime date;
 
-    public Transaction(TransactionEntity transferEntity, boolean isDebit) {
+    public Transaction(TransactionEntity transactionEntity, boolean isDebit) {
         if (isDebit) {
-            this.setConnectionEmail(transferEntity.getTransferPrimaryKey().getUserEntityConnection().getEmail());
-            this.setAmount(-transferEntity.getAmount());
+            this.setConnectionEmail(transactionEntity.getTransferPrimaryKey().getUserEntityConnection().getEmail());
+            this.setAmount(-transactionEntity.getAmount());
         } else {
-            this.setConnectionEmail(transferEntity.getTransferPrimaryKey().getUserEntity().getEmail());
-            this.setAmount(transferEntity.getAmount());
+            this.setConnectionEmail(transactionEntity.getTransferPrimaryKey().getUserEntity().getEmail());
+            this.setAmount(transactionEntity.getAmount());
         }
-        this.setDescription(transferEntity.getDescription());
-        this.setDate(transferEntity.getTransferPrimaryKey().getDate());
+        this.setDescription(transactionEntity.getDescription());
+        this.setDate(transactionEntity.getTransferPrimaryKey().getDate());
     }
 
+    @Override
+    public String toString() {
+        return String.format("{\"connectionEmail\":\"%s\", \"description\":\"%s\", \"amount\":%d, \"date\":\"%s\"}", connectionEmail, description, amount, date);
+    }
 }

@@ -1,5 +1,6 @@
 package com.api.payMyBuddy.model.entity;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,15 +13,16 @@ import java.io.Serializable;
 @Embeddable
 @Getter
 @Setter
+@EqualsAndHashCode
 @NoArgsConstructor
 public class ConnectionPrimaryKey implements Serializable {
 
     @ManyToOne
-    @JoinColumn(name="utilisateur_email")
+    @JoinColumn(name = "utilisateur_email", referencedColumnName = "email")
     private UserEntity userEntity;
 
     @ManyToOne
-    @JoinColumn(name="contact_email")
+    @JoinColumn(name = "contact_email", referencedColumnName = "email")
     private UserEntity userEntityConnection;
 
 }

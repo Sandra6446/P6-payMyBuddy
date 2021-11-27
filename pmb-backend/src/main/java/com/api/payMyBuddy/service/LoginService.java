@@ -4,7 +4,6 @@ import com.api.payMyBuddy.controller.UserController;
 import com.api.payMyBuddy.model.entity.UserEntity;
 import com.api.payMyBuddy.model.front.Login;
 import com.api.payMyBuddy.model.repository.UserEntityRepository;
-import lombok.Data;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,22 +13,25 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Data
 @Service
 public class LoginService {
 
     private static final Logger logger = LogManager.getLogger(UserController.class);
 
     @Autowired
-    private UserEntityRepository userEntityRepository;
+    private final UserEntityRepository userEntityRepository;
 
-    private boolean authorized = false;
+    public LoginService(UserEntityRepository userEntityRepository) {
+        this.userEntityRepository = userEntityRepository;
+    }
 
     public ResponseEntity<String> checkLogin(Login login) {
-        Optional<UserEntity> userEntityOptional = userEntityRepository.findById(login.getEmail());
+        boolean authorized = false;
+        Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(login.getEmail());
 
-        userEntityOptional.ifPresent(userEntity -> authorized = (userEntity.getPassword().equals(login.getPassword())));
-
+        if (userEntityOptional.isPresent()) {
+            authorized = (userEntityOptional.get().getPassword().equals(login.getPassword()));
+        }
         if (authorized) {
             logger.info("User " + login.getEmail() + " found in database.");
             return ResponseEntity.ok("User " + login.getEmail() + " authorized.");

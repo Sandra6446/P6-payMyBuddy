@@ -1,29 +1,29 @@
 package com.api.payMyBuddy.model.front;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.*;
 
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class Login {
 
     @NotNull
-    @NotEmpty
     private String email;
 
     @NotNull
-    @NotEmpty
     private String password;
 
     private String confirmPassword;
 
-    public Login(String email, String password) {
-        this.email = email;
-        this.password = password;
+    @SneakyThrows
+    @Override
+    public String toString() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(this);
     }
+
 }

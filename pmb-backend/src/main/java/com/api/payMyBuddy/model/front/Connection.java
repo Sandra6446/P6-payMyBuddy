@@ -1,9 +1,8 @@
 package com.api.payMyBuddy.model.front;
 
 import com.api.payMyBuddy.model.entity.ConnectionEntity;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -11,6 +10,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class Connection {
 
     @NotNull
@@ -26,8 +26,10 @@ public class Connection {
         this.setName(String.format("%s %s", connectionEntity.getConnectionPrimaryKey().getUserEntityConnection().getFirstName(), connectionEntity.getConnectionPrimaryKey().getUserEntityConnection().getLastName()));
     }
 
-    public Connection(String email, String name) {
-        this.email = email;
-        this.name = name;
+    @SneakyThrows
+    @Override
+    public String toString() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(this);
     }
 }

@@ -4,23 +4,19 @@ import com.api.payMyBuddy.controller.UserController;
 import com.api.payMyBuddy.model.entity.UserEntity;
 import com.api.payMyBuddy.model.front.User;
 import com.api.payMyBuddy.model.repository.UserEntityRepository;
-import com.fasterxml.jackson.databind.ser.FilterProvider;
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import lombok.Data;
+import com.api.payMyBuddy.model.requestBody.UserProfile;
+import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
 import java.util.Optional;
 
-@Data
 @Service
+@AllArgsConstructor
 public class UserService {
 
     private static final Logger logger = LogManager.getLogger(UserController.class);
@@ -36,7 +32,7 @@ public class UserService {
             logger.error("The two passwords are different");
             return new ResponseEntity<>("The two passwords are different", HttpStatus.BAD_REQUEST);
         } else {
-            Optional<UserEntity> userEntityOptional = userEntityRepository.findById(user.getEmail());
+            Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(user.getEmail());
             if (!userEntityOptional.isEmpty()) {
                 logger.error("User already In Database");
                 return new ResponseEntity<>("User already registered", HttpStatus.CONFLICT);
@@ -50,7 +46,7 @@ public class UserService {
     }
 
     public ResponseEntity<Object> readUserByEmail(String user_email) {
-        Optional<UserEntity> userEntityOptional = userEntityRepository.findById(user_email);
+        Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(user_email);
         if (userEntityOptional.isEmpty()) {
             logger.error("User not found");
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
@@ -61,38 +57,36 @@ public class UserService {
     }
 
     public ResponseEntity<Object> getBalance(String user_email) {
-        User user = (User) readUserByEmail(user_email).getBody();
-        if (Objects.isNull(user.getEmail())) {
+        Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(user_email);
+        if (userEntityOptional.isEmpty()) {
+            logger.error("User not found");
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         } else {
-            FilterProvider filterProvider = new SimpleFilterProvider()
-                    .addFilter("userFilter", SimpleBeanPropertyFilter.filterOutAllExcept("balance"));
-            MappingJacksonValue connections = new MappingJacksonValue(user);
-            connections.setFilters(filterProvider);
-            return ResponseEntity.ok(connections);
+            User user = new User(userEntityOptional.get());
+            String balance = "{\"balance\": " + user.getBalance() + "}";
+            return ResponseEntity.ok(balance);
         }
     }
 
-    public ResponseEntity<Object> updateUser(User user) {
-        if (!user.getPassword().isEmpty() && user.getConfirmPassword().isEmpty()) {
+    // TODO Vérifier création User avec changement de mail
+    public ResponseEntity<Object> updateUser(String email, UserProfile profile) {
+        if (!profile.getPassword().isEmpty() && profile.getConfirmPassword().isEmpty()) {
             logger.error("Confirm password is required");
             return new ResponseEntity<>("Confirm password is required", HttpStatus.BAD_REQUEST);
-        } else if (!user.getPassword().isEmpty() && !user.getPassword().equals(user.getConfirmPassword())) {
+        } else if (!profile.getPassword().isEmpty() && !profile.getPassword().equals(profile.getConfirmPassword())) {
             logger.error("The two passwords are different");
             return new ResponseEntity<>("The two passwords are different", HttpStatus.BAD_REQUEST);
         } else {
-            Optional<UserEntity> userEntityOptional = userEntityRepository.findById(user.getEmail());
+            Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(email);
             if (userEntityOptional.isEmpty()) {
                 logger.error("User not found");
                 return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
             } else {
-                if (user.getPassword().isEmpty()) {
-                    user.setPassword(userEntityOptional.get().getPassword());
-                }
-                UserEntity userEntity = new UserEntity(user);
+                UserEntity userEntity = userEntityOptional.get();
+                userEntity.update(profile);
                 userEntityRepository.saveAndFlush(userEntity);
-                logger.info("User " + user.getEmail() + " updated");
-                return ResponseEntity.ok("User " + user.getEmail() + " updated");
+                logger.info("User " + profile.getEmail() + " updated");
+                return ResponseEntity.ok("User " + profile.getEmail() + " updated");
             }
         }
     }
