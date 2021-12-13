@@ -95,8 +95,8 @@ export default {
   },
   mounted() {
     if (this.$route.params.email !== undefined) {
-      this.getUser(this.$route.params.email);
-      this.getTransactions(this.$route.params.email);
+      this.getUser(this.userEmail);
+      this.getTransactions(this.userEmail);
     } else {
       this.$router.replace({ name: "Login" });
     }
@@ -105,6 +105,9 @@ export default {
     fullName: function () {
       return this.currentUser.firstName + " " + this.currentUser.lastName;
     },
+    userEmail() {
+      return this.$route.params.email
+    }
   },
 };
 </script>

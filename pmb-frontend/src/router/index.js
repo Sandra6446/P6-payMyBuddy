@@ -48,8 +48,7 @@ const routes = [
   {
     path: '/summary',
     name: 'Summary',
-    component: Summary,
-    props: true
+    component: Summary
   },
   {
     path: '/profile',

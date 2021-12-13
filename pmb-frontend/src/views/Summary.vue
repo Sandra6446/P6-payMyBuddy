@@ -5,10 +5,18 @@
     <nav aria-label="breadcrumb" class="bg-light">
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
-          <router-link to="/home">Home</router-link>
+          <router-link :to="{ name: 'Home', params: { email: this.userEmail } }"
+            >Home</router-link
+          >
         </li>
         <li class="breadcrumb-item">
-          <router-link to="/transfer">Transfer</router-link>
+          <router-link
+            :to="{
+              name: 'Transfer',
+              params: { email: this.userEmail },
+            }"
+            >Transfer</router-link
+          >
         </li>
         <li class="breadcrumb-item active" aria-current="page">Summary</li>
       </ol>
@@ -20,8 +28,8 @@
           <div class="card my-5">
             <div class="card-header text-start fw-bold">Connection</div>
             <div class="card-body">
-              <p class="card-text">Hayley</p>
-              <p class="card-text">{{connectionEmail}}</p>
+              <p class="card-text">{{ this.connection.name }}</p>
+              <p class="card-text">{{ this.connection.email }}</p>
             </div>
           </div>
 
@@ -37,7 +45,7 @@
           <div class="card my-5">
             <div class="card-header text-start fw-bold">Amount</div>
             <div class="card-body">
-              <p class="card-text" id="amount">{{amount}}€</p>
+              <p class="card-text" id="amount">{{ this.amount }}€</p>
             </div>
           </div>
 
@@ -60,10 +68,6 @@ export default {
     Header,
     SubmitButton,
   },
-  props: {
-      connectionEmail:String,
-      amount:String,
-  },
   methods: {
     onSubmit() {
       /*     var data = {
@@ -78,6 +82,17 @@ export default {
           alert(e);
         });*/
       this.$router.push("/transfer");
+    },
+  },
+  computed: {
+    userEmail() {
+      return this.$route.params.email;
+    },
+    connection() {
+      return this.$route.params.connection;
+    },
+    amount() {
+      return this.$route.params.amount;
     },
   },
 };

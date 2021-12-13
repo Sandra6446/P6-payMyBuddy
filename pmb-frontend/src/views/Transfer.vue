@@ -5,8 +5,7 @@
     <nav aria-label="breadcrumb" class="bg-light">
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
-          <router-link
-            :to="{ name: 'Home', params: { email: this.$route.params.email } }"
+          <router-link :to="{ name: 'Home', params: { email: this.userEmail } }"
             >Home</router-link
           >
         </li>
@@ -32,7 +31,7 @@
           </div>
         </div>
 
-        <form class="needs-validation">
+        <form class="needs-validation" @submit="onSubmit">
           <div
             class="card h-100 text-dark bg-light mb-3 justify-content-center"
           >
@@ -42,13 +41,13 @@
                   <select
                     class="form-select form-select-md"
                     aria-label="Select connection"
-                    v-model="form.connectionEmail"
+                    v-model="form.connection"
                   >
                     <option value="" selected>Connections</option>
                     <option
                       v-for="connection in connections"
                       :key="connection.name"
-                      :value="connection.email"
+                      :value="connection"
                     >
                       {{ connection.name }}
                     </option>
@@ -64,11 +63,7 @@
                   />
                 </div>
                 <div class="d-grid col-2">
-                  <button
-                    class="btn col-12"
-                    id="payButton"
-                    type="submit"
-                  >
+                  <button class="btn col-12" id="payButton" type="submit">
                     Pay
                   </button>
                 </div>
@@ -123,7 +118,10 @@ export default {
       connections: [],
       transactions: [],
       form: {
-        connectionEmail: "",
+        connection: {
+          email: "",
+          name: "",
+        },
         amount: 0,
       },
     };
@@ -155,14 +153,33 @@ export default {
           }
         });
     },
+    onSubmit() {
+      if (this.form.connection.email === "" || this.form.amount <= 0) {
+        alert("A connection and a positive amount are required");
+      } else {
+        this.$router.push({
+          name: "Summary",
+          params: {
+            email: this.userEmail,
+            connection: this.form.connection,
+            amount: this.form.amount,
+          },
+        });
+      }
+    },
   },
   mounted() {
     if (this.$route.params.email !== undefined) {
-      this.getConnections(this.$route.params.email);
-      this.getTransactions(this.$route.params.email);
+      this.getConnections(this.userEmail);
+      this.getTransactions(this.userEmail);
     } else {
       this.$router.replace({ name: "Login" });
     }
+  },
+  computed: {
+    userEmail() {
+      return this.$route.params.email;
+    },
   },
 };
 </script>
