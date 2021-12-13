@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.api.payMyBuddy.controller.UserControllerTest
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 10.122 s - in com.api.payMyBuddy.controller.UserControllerTest
