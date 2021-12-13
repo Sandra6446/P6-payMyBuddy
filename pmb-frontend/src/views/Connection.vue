@@ -15,18 +15,21 @@
     </nav>
 
     <div class="card col-8 mx-auto py-5">
-
       <div class="row justify-content-center">
         <MainTitle></MainTitle>
       </div>
 
       <form class="needs-validation" @submit="onSubmit">
         <div class="py-5">
-          <label for="email" class="form-label col-11 text-start">Please enter the email of the new contact : </label>
-          <EmailInput
-            v-model="form.email"
-            label="Please enter the email of the new contact"
-          ></EmailInput>
+          <div class="col-9 mx-auto">
+            <label for="email" class="form-label col-11 text-start"
+              >Please enter the email of the new contact :
+            </label>
+            <EmailInput
+              v-model="form.email"
+              label="Please enter the email of the new contact"
+            ></EmailInput>
+          </div>
         </div>
 
         <div class="col-8 col-sm-3 mx-auto">
@@ -42,7 +45,7 @@ import Header from "../components/Header.vue";
 import MainTitle from "../components/MainTitle.vue";
 import SubmitButton from "../components/SubmitButton.vue";
 import EmailInput from "../components/EmailInput.vue";
-/*import ConnectionService from "../services/ConnectionService";*/
+import ConnectionService from "../services/ConnectionService";
 
 export default {
   name: "Connection",
@@ -61,19 +64,33 @@ export default {
   },
   methods: {
     onSubmit() {
-      /*     var data = {
-        email: this.form.email,
+      var data = {
+        userEmail: this.$route.params.email,
+        connectionEmail: this.form.email
       };
-      alert(JSON.stringify(this.form));
-      ConnectionService.submit(data)
+      ConnectionService.addConnection(data)
         .then((response) => {
-          alert(response);
+          if (response.status === 201) {
+            alert(response.data);
+            this.$router.push({
+              name: "Transfer",
+              params: { email: this.$route.params.email },
+            });
+          }
         })
         .catch((e) => {
-          alert(e);
-        });*/
-      this.$router.push("/transfer");
+          if (e.response) {
+            alert(e.response.data);
+          } else {
+            alert(e);
+          }
+        });
     },
+  },
+  mounted() {
+    if (this.$route.params.email === undefined) {
+      this.$router.replace({ name: "Login" });
+    }
   },
 };
 </script>
@@ -82,7 +99,7 @@ export default {
 .card {
   height: 80vh;
   width: 80vw;
-  position:fixed;
+  position: fixed;
   left: 10vw;
   right: 10vw;
 }

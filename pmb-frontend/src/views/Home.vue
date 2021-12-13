@@ -1,6 +1,5 @@
 <template>
   <div class="container-fluid" id="home">
-    
     <Header></Header>
 
     <nav aria-label="breadcrumb" class="bg-light">
@@ -11,12 +10,12 @@
 
     <div class="col col-10 mx-auto">
       <div class="row justify-content-md-center my-5">
-        <h1>Welcome {{ name }}</h1>
+        <h1>Welcome {{ fullName }}</h1>
       </div>
       <div class="card text-center my-5">
         <div class="card-header">Available balance</div>
         <div class="card-body">
-          <p class="card-text">{{ balance }} €</p>
+          <p class="card-text">{{ this.currentUser.balance }} €</p>
         </div>
       </div>
 
@@ -36,10 +35,10 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in items" v-bind:key="item.id">
-            <td>{{ item.connection }}</td>
-            <td>{{ item.description }}</td>
-            <td>{{ item.amount }}</td>
+          <tr v-for="transaction in transactions" v-bind:key="transaction.date">
+            <td>{{ transaction.connection.name }}</td>
+            <td>{{ transaction.description }}</td>
+            <td>{{ transaction.amount }}</td>
           </tr>
         </tbody>
       </table>
@@ -48,53 +47,64 @@
 </template>
 
  <script>
-import Header from '../components/Header.vue';
+import Header from "../components/Header.vue";
+import UserService from "../services/UserService";
+import TransactionService from "../services/TransactionService";
 
 export default {
   name: "Home",
   components: {
-    Header
+    Header,
   },
   data() {
     return {
-      name: "Laure Brun",
-      balance: 20,
-      items: [
-        {
-          id: 1,
-          connection: "Hayley",
-          description: "Jane's gift",
-          amount: "20€",
-        },
-        {
-          id: 2,
-          connection: "Hayley",
-          description: "Restaurant bill share",
-          amount: "-10€",
-        },
-        {
-          id: 3,
-          connection: "Clara",
-          description: "Trip money",
-          amount: "-25€",
-        },
-        {
-          id: 4,
-          connection: "Smith",
-          description: "Movie tickets",
-          amount: "-8€",
-        },
-        {
-          id: 5,
-          connection: "Clara",
-          description: "Movie tickets",
-          amount: "8€",
-        },
-      ],
-      perPage: 3,
-      totalRows: 1,
-      currentPage: 1,
+      currentUser: {
+        firstName: "",
+        lastName: "",
+      },
+      transactions: [],
     };
+  },
+  methods: {
+    getUser(email) {
+      UserService.getUser(email)
+        .then((response) => {
+          this.currentUser = response.data;
+        })
+        .catch((e) => {
+          if (e.response) {
+            alert(e.response.data);
+          } else {
+            alert(e);
+          }
+        });
+    },
+    getTransactions(email) {
+      TransactionService.getTransactions(email)
+        .then((response) => {
+          this.transactions = response.data;
+        })
+        .catch((e) => {
+          if (e.response) {
+            alert(e.response.data);
+          } else {
+            alert(e);
+          }
+        });
+    },
+  },
+  mounted() {
+    if (this.$route.params.email !== undefined) {
+      this.getUser(this.$route.params.email);
+      this.getTransactions(this.$route.params.email);
+    } else {
+      this.$router.replace({ name: "Login" });
+    }
+  },
+  computed: {
+    fullName: function () {
+      return this.currentUser.firstName + " " + this.currentUser.lastName;
+    },
   },
 };
 </script>

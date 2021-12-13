@@ -5,7 +5,10 @@
     <nav aria-label="breadcrumb" class="bg-light">
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
-          <router-link to="/home" replace>Home</router-link>
+          <router-link
+            :to="{ name: 'Home', params: { email: this.$route.params.email } }"
+            >Home</router-link
+          >
         </li>
         <li class="breadcrumb-item active" aria-current="page">Transfer</li>
       </ol>
@@ -16,7 +19,12 @@
         <div class="row align-items-center justify-content-between">
           <div class="col-auto text-center">Send Money</div>
           <div class="col-auto">
-            <router-link to="/connection">
+            <router-link
+              :to="{
+                name: 'Connection',
+                params: { email: this.$route.params.email },
+              }"
+            >
               <button type="button" class="btn btn-primary">
                 Add Connection
               </button>
@@ -24,7 +32,7 @@
           </div>
         </div>
 
-        <form class="needs-validation" @submit="onSubmit">
+        <form class="needs-validation">
           <div
             class="card h-100 text-dark bg-light mb-3 justify-content-center"
           >
@@ -34,11 +42,16 @@
                   <select
                     class="form-select form-select-md"
                     aria-label="Select connection"
+                    v-model="form.connectionEmail"
                   >
-                    <option selected>Connection</option>
-                    <option value="1">Hayley</option>
-                    <option value="2">Smith</option>
-                    <option value="3">Clara</option>
+                    <option value="" selected>Connections</option>
+                    <option
+                      v-for="connection in connections"
+                      :key="connection.name"
+                      :value="connection.email"
+                    >
+                      {{ connection.name }}
+                    </option>
                   </select>
                 </div>
                 <div class="col-2">
@@ -47,10 +60,15 @@
                     class="form-control"
                     value="0"
                     aria-label="Amount"
+                    v-model="form.amount"
                   />
                 </div>
                 <div class="d-grid col-2">
-                  <button class="btn col-12" id="payButton" type="submit">
+                  <button
+                    class="btn col-12"
+                    id="payButton"
+                    type="submit"
+                  >
                     Pay
                   </button>
                 </div>
@@ -75,10 +93,13 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in items" v-bind:key="item.id">
-              <td>{{ item.connection }}</td>
-              <td>{{ item.description }}</td>
-              <td>{{ item.amount }}</td>
+            <tr
+              v-for="transaction in transactions"
+              v-bind:key="transaction.date"
+            >
+              <td>{{ transaction.connection.name }}</td>
+              <td>{{ transaction.description }}</td>
+              <td>{{ transaction.amount }}</td>
             </tr>
           </tbody>
         </table>
@@ -89,6 +110,8 @@
 
  <script>
 import Header from "../components/Header.vue";
+import ConnectionService from "../services/ConnectionService";
+import TransactionService from "../services/TransactionService";
 
 export default {
   name: "Transfer",
@@ -97,45 +120,49 @@ export default {
   },
   data() {
     return {
-      items: [
-        {
-          id: 1,
-          connection: "Hayley",
-          description: "Restaurant bill share",
-          amount: "10€",
-        },
-        {
-          id: 2,
-          connection: "Hayley",
-          description: "Trip money",
-          amount: "25€",
-        },
-        {
-          id: 3,
-          connection: "Smith",
-          description: "Movie tickets",
-          amount: "8€",
-        },
-      ],
+      connections: [],
+      transactions: [],
+      form: {
+        connectionEmail: "",
+        amount: 0,
+      },
     };
   },
   methods: {
-    onSubmit() {
-      /* var data = {
-        email: this.form.email,
-        password: this.form.password,
-      };
-      alert(JSON.stringify(data));
-     LoginService.submit(data)
+    getConnections(email) {
+      ConnectionService.getConnections(email)
         .then((response) => {
-          alert(response);
+          this.connections = response.data;
         })
         .catch((e) => {
-          alert(e);
+          if (e.response) {
+            alert(e.response.data);
+          } else {
+            alert(e);
+          }
         });
-        */
-      this.$router.push("/summary");
     },
+    getTransactions(email) {
+      TransactionService.getMyTransactions(email)
+        .then((response) => {
+          this.transactions = response.data;
+        })
+        .catch((e) => {
+          if (e.response) {
+            alert(e.response.data);
+          } else {
+            alert(e);
+          }
+        });
+    },
+  },
+  mounted() {
+    if (this.$route.params.email !== undefined) {
+      this.getConnections(this.$route.params.email);
+      this.getTransactions(this.$route.params.email);
+    } else {
+      this.$router.replace({ name: "Login" });
+    }
   },
 };
 </script>

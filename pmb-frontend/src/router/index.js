@@ -30,22 +30,26 @@ const routes = [
   {
     path: '/home',
     name: 'Home',
-    component: Home
+    component: Home,
+    alias: '/home/:email'
   },
   {
     path: '/transfer',
     name: 'Transfer',
     component: Transfer,
+    alias: '/transfer/:email'
   },
   {
     path: '/connection',
     name: 'Connection',
     component: Connection,
+    alias: '/connection/:email'
   },
   {
     path: '/summary',
     name: 'Summary',
-    component: Summary
+    component: Summary,
+    props: true
   },
   {
     path: '/profile',

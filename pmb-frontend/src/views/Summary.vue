@@ -21,7 +21,7 @@
             <div class="card-header text-start fw-bold">Connection</div>
             <div class="card-body">
               <p class="card-text">Hayley</p>
-              <p class="card-text">hayley@email.com</p>
+              <p class="card-text">{{connectionEmail}}</p>
             </div>
           </div>
 
@@ -34,10 +34,10 @@
             </div>
           </div>
 
-          <div class="card my-5 ">
+          <div class="card my-5">
             <div class="card-header text-start fw-bold">Amount</div>
             <div class="card-body">
-              <p class="card-text" id="amount">20€</p>
+              <p class="card-text" id="amount">{{amount}}€</p>
             </div>
           </div>
 
@@ -59,6 +59,10 @@ export default {
   components: {
     Header,
     SubmitButton,
+  },
+  props: {
+      connectionEmail:String,
+      amount:String,
   },
   methods: {
     onSubmit() {

@@ -116,7 +116,7 @@ import IdentityInput from "../components/IdentityInput.vue";
 import EmailInput from "../components/EmailInput.vue";
 import PasswordInput from "../components/PasswordInput.vue";
 import RibInput from "../components/RibInput.vue";
-/*import UserService from "../services/UserService.js";*/
+import UserService from "../services/UserService.js";
 
 export default {
   name: "Signup",
@@ -142,24 +142,27 @@ export default {
   },
   methods: {
     onSubmit() {
-      /*  var data = {
-        firstName: this.firstName,
-        lastName: this.lastName,
-        email: this.email,
-        password: this.password,
-        confirmPassword: this.confirmPassword,
-        bankAccount: { bank: this.bank, iban: this.iban, bic: this.bic },
+      var data = {
+        firstName: this.form.firstName,
+        lastName: this.form.lastName,
+        email: this.form.email,
+        password: this.form.password,
+        confirmPassword: this.form.confirmPassword,
+        bankAccount: { bank: this.form.bankAccount.bank, iban: this.form.bankAccount.iban, bic: this.form.bankAccount.bic },
       };
-      alert(JSON.stringify(this.form));
-      UserService.submit(data)
+      alert(data.firstName);
+      UserService.add(data)
         .then((response) => {
-          alert(response);
+          if (response.status === 201) {
+            this.$router.replace("/home");
+          } else {
+            alert(response.data);
+          }
         })
         .catch((e) => {
           alert(e);
-          
-        });*/
-      this.$router.replace("/home");
+        });
+      
     },
   },
 };

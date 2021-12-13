@@ -15,7 +15,7 @@
             v-model="form.password"
             id="password"
             placeholder="Password"
-            passwordRequired="passwordRequired"
+            v-bind:passwordRequired="true"
           ></PasswordInput>
 
           <div class="row justify-content-center">
@@ -50,7 +50,7 @@ import MainTitle from "../components/MainTitle.vue";
 import SubmitButton from "../components/SubmitButton.vue";
 import EmailInput from "../components/EmailInput.vue";
 import PasswordInput from "../components/PasswordInput.vue";
-/*import LoginService from "../services/LoginService";*/
+import LoginService from "../services/LoginService";
 
 export default {
   name: "Login",
@@ -66,25 +66,27 @@ export default {
         email: "",
         password: "",
       },
-      passwordRequired: true
     };
   },
   methods: {
     onSubmit() {
-      /* var data = {
+      var data = {
         email: this.form.email,
         password: this.form.password,
       };
-      alert(JSON.stringify(data));
-     LoginService.submit(data)
+      LoginService.submit(data)
         .then((response) => {
-          alert(response);
+          if (response.status === 200) {
+            this.$router.push({ name: 'Home', params: { email: data.email } });
+          }
         })
         .catch((e) => {
-          alert(e);
+          if (e.response) {
+            alert(e.response.data);
+          } else {
+            alert(e);
+          }
         });
-        */
-      this.$router.replace("/home");
     },
   },
 };

@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid"> 
+  <div class="container-fluid">
     <nav class="navbar navbar-expand-lg navbar-light">
       <div class="container-fluid">
         <span class="navbar-brand"><MainTitle></MainTitle></span>
@@ -17,8 +17,16 @@
         <div class="col-auto me-5 d-flex">
           <div class="collapse navbar-collapse" id="navbarHeader">
             <div class="navbar-nav">
-              <router-link class="nav-link" to="/home">Home</router-link>
-              <router-link class="nav-link" to="/transfer">Transfer</router-link>
+              <router-link
+                class="nav-link"
+                :to="{ name: 'Home', params: { email:this.$route.params.email } }"
+                >Home</router-link
+              >
+              <router-link
+                class="nav-link"
+                :to="{ name: 'Transfer', params: { email:this.$route.params.email } }"
+                >Transfer</router-link
+              >
               <router-link class="nav-link" to="/profile">Profile</router-link>
               <router-link class="nav-link" to="/contact">Contact</router-link>
               <router-link class="nav-link" to="/">Log off</router-link>
@@ -37,7 +45,7 @@ export default {
   name: "Header",
   components: {
     MainTitle,
-  }
+  },
 };
 </script>
 
