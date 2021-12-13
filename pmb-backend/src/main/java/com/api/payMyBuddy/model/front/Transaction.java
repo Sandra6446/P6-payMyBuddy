@@ -18,7 +18,7 @@ public class Transaction {
 
     @NotNull
     @NotEmpty
-    String connectionEmail;
+    Connection connection;
 
     @NotNull
     @NotEmpty
@@ -32,10 +32,10 @@ public class Transaction {
 
     public Transaction(TransactionEntity transactionEntity, boolean isDebit) {
         if (isDebit) {
-            this.setConnectionEmail(transactionEntity.getTransferPrimaryKey().getUserEntityConnection().getEmail());
+            this.setConnection(new Connection(transactionEntity.getTransferPrimaryKey().getUserEntityConnection()));
             this.setAmount(-transactionEntity.getAmount());
         } else {
-            this.setConnectionEmail(transactionEntity.getTransferPrimaryKey().getUserEntity().getEmail());
+            this.setConnection(new Connection(transactionEntity.getTransferPrimaryKey().getUserEntity()));
             this.setAmount(transactionEntity.getAmount());
         }
         this.setDescription(transactionEntity.getDescription());
@@ -44,6 +44,6 @@ public class Transaction {
 
     @Override
     public String toString() {
-        return String.format("{\"connectionEmail\":\"%s\", \"description\":\"%s\", \"amount\":%d, \"date\":\"%s\"}", connectionEmail, description, amount, date);
+        return String.format("{\"connectionEmail\":\"%s\", \"description\":\"%s\", \"amount\":%d, \"date\":\"%s\"}", connection, description, amount, date);
     }
 }

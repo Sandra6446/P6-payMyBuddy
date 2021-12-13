@@ -4,7 +4,6 @@ import com.api.payMyBuddy.controller.UserController;
 import com.api.payMyBuddy.model.entity.UserEntity;
 import com.api.payMyBuddy.model.front.User;
 import com.api.payMyBuddy.model.repository.UserEntityRepository;
-import com.api.payMyBuddy.model.requestBody.UserProfile;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -69,11 +68,11 @@ public class UserService {
     }
 
     // TODO Vérifier création User avec changement de mail
-    public ResponseEntity<Object> updateUser(String email, UserProfile profile) {
-        if (!profile.getPassword().isEmpty() && profile.getConfirmPassword().isEmpty()) {
+    public ResponseEntity<Object> updateUser(String email, User user) {
+        if (!user.getPassword().isEmpty() && user.getConfirmPassword().isEmpty()) {
             logger.error("Confirm password is required");
             return new ResponseEntity<>("Confirm password is required", HttpStatus.BAD_REQUEST);
-        } else if (!profile.getPassword().isEmpty() && !profile.getPassword().equals(profile.getConfirmPassword())) {
+        } else if (!user.getPassword().isEmpty() && !user.getPassword().equals(user.getConfirmPassword())) {
             logger.error("The two passwords are different");
             return new ResponseEntity<>("The two passwords are different", HttpStatus.BAD_REQUEST);
         } else {
@@ -83,10 +82,10 @@ public class UserService {
                 return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
             } else {
                 UserEntity userEntity = userEntityOptional.get();
-                userEntity.update(profile);
+                userEntity.update(user);
                 userEntityRepository.saveAndFlush(userEntity);
-                logger.info("User " + profile.getEmail() + " updated");
-                return ResponseEntity.ok("User " + profile.getEmail() + " updated");
+                logger.info("User " + user.getEmail() + " updated");
+                return ResponseEntity.ok("User " + user.getEmail() + " updated");
             }
         }
     }

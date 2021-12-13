@@ -3,20 +3,15 @@ package com.api.payMyBuddy.service;
 import com.api.payMyBuddy.controller.UserController;
 import com.api.payMyBuddy.model.entity.TransactionEntity;
 import com.api.payMyBuddy.model.entity.UserEntity;
-import com.api.payMyBuddy.model.front.User;
 import com.api.payMyBuddy.model.repository.TransactionEntityRepository;
 import com.api.payMyBuddy.model.repository.UserEntityRepository;
 import com.api.payMyBuddy.model.requestBody.TransactionBody;
 import com.api.payMyBuddy.service.mapper.MapperTransaction;
-import com.fasterxml.jackson.databind.ser.FilterProvider;
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -45,12 +40,7 @@ public class TransactionService {
             logger.error(message);
             return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
         } else {
-            User user = new User(userEntityOptional.get());
-            FilterProvider filterProvider = new SimpleFilterProvider()
-                    .addFilter("userFilter", SimpleBeanPropertyFilter.filterOutAllExcept("debits"));
-            MappingJacksonValue connections = new MappingJacksonValue(user);
-            connections.setFilters(filterProvider);
-            return ResponseEntity.ok(connections);
+            return ResponseEntity.ok(userEntityOptional.get().getDebits());
         }
     }
 
@@ -62,8 +52,8 @@ public class TransactionService {
             logger.error(message);
             return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
         } else {
-            User user = new User(userEntityOptional.get());
-            return ResponseEntity.ok(mapperTransaction.getAllTransactions(user));
+            UserEntity userEntity = userEntityOptional.get();
+            return ResponseEntity.ok(mapperTransaction.getAllTransactions(userEntity));
         }
     }
 

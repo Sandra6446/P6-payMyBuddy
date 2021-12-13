@@ -19,7 +19,7 @@ public class TransactionPrimaryKey implements Serializable {
                     CascadeType.MERGE
             }
     )
-    @JoinColumn(name="utilisateur_email")
+    @JoinColumn(name="utilisateur_email",referencedColumnName = "email")
     private UserEntity userEntity;
 
     @ManyToOne(
@@ -27,7 +27,7 @@ public class TransactionPrimaryKey implements Serializable {
                     CascadeType.MERGE
             }
     )
-    @JoinColumn(name="destinataire_email")
+    @JoinColumn(name="destinataire_email",referencedColumnName = "email")
     private UserEntity userEntityConnection;
 
     @Column

@@ -2,10 +2,10 @@ package com.api.payMyBuddy.service;
 
 import com.api.payMyBuddy.model.entity.ConnectionEntity;
 import com.api.payMyBuddy.model.entity.UserEntity;
-import com.api.payMyBuddy.model.front.User;
 import com.api.payMyBuddy.model.repository.ConnectionEntityRepository;
 import com.api.payMyBuddy.model.repository.UserEntityRepository;
 import com.api.payMyBuddy.model.requestBody.ConnectionBody;
+import com.api.payMyBuddy.service.mapper.MapperConnection;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,6 +27,9 @@ public class ConnectionService {
 
     @Autowired
     private ConnectionEntityRepository connectionEntityRepository;
+
+    @Autowired
+    MapperConnection mapperConnection;
 
     public ResponseEntity<String> createConnection(ConnectionBody connectionBody) {
         String message = "";
@@ -66,9 +69,8 @@ public class ConnectionService {
             logger.error(message);
             return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
         } else {
-            User user = new User(userEntityOptional.get());
-            String connections = "{\"connections\": "+user.getConnections()+"}";
-            return ResponseEntity.ok(connections);
+            UserEntity userEntity = userEntityOptional.get();
+            return ResponseEntity.ok(mapperConnection.getConnections(userEntity));
         }
     }
 }

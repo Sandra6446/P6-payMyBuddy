@@ -1,7 +1,6 @@
 package com.api.payMyBuddy.controller;
 
 import com.api.payMyBuddy.model.front.User;
-import com.api.payMyBuddy.model.requestBody.UserProfile;
 import com.api.payMyBuddy.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "http://localhost:8090")
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
@@ -50,11 +50,11 @@ public class UserController extends ValidationClass {
 
     @ApiOperation("Updates a user")
     @PutMapping("/{email}")
-    public ResponseEntity<Object> updateUser(@PathVariable String email, @RequestBody UserProfile profile) {
-        if(isNotValid(profile)) {
+    public ResponseEntity<Object> updateUser(@PathVariable String email, @RequestBody User user) {
+        if(isNotValid(user)) {
             return new ResponseEntity<>("Error in request body", HttpStatus.BAD_REQUEST);
         } else {
-            return userService.updateUser(email,profile);
+            return userService.updateUser(email,user);
         }
     }
 }

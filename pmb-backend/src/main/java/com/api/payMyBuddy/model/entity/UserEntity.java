@@ -1,7 +1,6 @@
 package com.api.payMyBuddy.model.entity;
 
 import com.api.payMyBuddy.model.front.User;
-import com.api.payMyBuddy.model.requestBody.UserProfile;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
@@ -20,17 +19,17 @@ import java.util.List;
 public class UserEntity implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int userId;
 
     @NotNull
     private String email;
 
-    @Column(name = "nom")
+    @Column(name = "prenom")
     private String firstName;
 
-    @Column(name = "prenom")
+    @Column(name = "nom")
     private String lastName;
 
     @Column(name = "mot_de_passe")
@@ -74,34 +73,32 @@ public class UserEntity implements Serializable {
         this.setFirstName(user.getFirstName());
         this.setLastName(user.getLastName());
         this.setPassword(user.getPassword());
-        this.setBalance(user.getBalance());
         this.setBank(user.getBankAccount().getBank());
         this.setBic(user.getBankAccount().getBic());
         this.setIban(user.getBankAccount().getIban());
-        // TODO List of connections, credits, debits
     }
 
-    public void update(UserProfile userProfile) {
-        if (!userProfile.getEmail().isEmpty()) {
-            this.setEmail(userProfile.getEmail());
+    public void update(User user) {
+        if (!user.getEmail().isEmpty()) {
+            this.setEmail(user.getEmail());
         }
-        if (!userProfile.getFirstName().isEmpty()) {
-            this.setFirstName(userProfile.getFirstName());
+        if (!user.getFirstName().isEmpty()) {
+            this.setFirstName(user.getFirstName());
         }
-        if (!userProfile.getLastName().isEmpty()) {
-            this.setLastName(userProfile.getLastName());
+        if (!user.getLastName().isEmpty()) {
+            this.setLastName(user.getLastName());
         }
-        if (!userProfile.getPassword().isEmpty()) {
-            this.setPassword(userProfile.getPassword());
+        if (!user.getPassword().isEmpty()) {
+            this.setPassword(user.getPassword());
         }
-        if (!userProfile.getBankAccount().getBank().isEmpty()) {
-            this.setBank(userProfile.getBankAccount().getBank());
+        if (!user.getBankAccount().getBank().isEmpty()) {
+            this.setBank(user.getBankAccount().getBank());
         }
-        if (!userProfile.getBankAccount().getIban().isEmpty()) {
-            this.setIban(userProfile.getBankAccount().getIban());
+        if (!user.getBankAccount().getIban().isEmpty()) {
+            this.setIban(user.getBankAccount().getIban());
         }
-        if (!userProfile.getBankAccount().getBic().isEmpty()) {
-            this.setBic(userProfile.getBankAccount().getBic());
+        if (!user.getBankAccount().getBic().isEmpty()) {
+            this.setBic(user.getBankAccount().getBic());
         }
     }
 

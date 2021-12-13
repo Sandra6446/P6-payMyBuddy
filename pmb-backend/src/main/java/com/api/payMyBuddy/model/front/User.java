@@ -1,9 +1,8 @@
 package com.api.payMyBuddy.model.front;
 
-import com.api.payMyBuddy.model.entity.ConnectionEntity;
-import com.api.payMyBuddy.model.entity.TransactionEntity;
 import com.api.payMyBuddy.model.entity.UserEntity;
 import com.api.payMyBuddy.model.requestBody.UserProfile;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,8 +12,6 @@ import lombok.SneakyThrows;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 @Getter
@@ -30,20 +27,23 @@ public class User extends Login {
     @NotEmpty
     private String lastName;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private double balance;
 
     @NotNull
     @Valid
     private BankAccount bankAccount;
 
-    @Valid
+/*    @Valid
     private List<Connection> connections;
 
+    @JsonIgnore
     @Valid
     private List<Transaction> debits;
 
+    @JsonIgnore
     @Valid
-    private List<Transaction> credits;
+    private List<Transaction> credits;*/
 
     public User(UserEntity userEntity) {
         this.setEmail(userEntity.getEmail());
@@ -54,7 +54,7 @@ public class User extends Login {
         this.setBalance(userEntity.getBalance());
         this.setBankAccount(new BankAccount(userEntity.getBank(), userEntity.getIban(), userEntity.getBic()));
 
-        List <Transaction> debits = new ArrayList<>();
+/*        List <Transaction> debits = new ArrayList<>();
         if (!userEntity.getDebits().isEmpty()) {
             for (TransactionEntity debit : userEntity.getDebits()) {
                 debits.add(new Transaction(debit,true));
@@ -78,7 +78,7 @@ public class User extends Login {
                 connections.add(new Connection(connectionEntity));
             }
         }
-        this.setConnections(connections);
+        this.setConnections(connections);*/
     }
 
     public User(@NotNull @NotEmpty String email, @NotNull @NotEmpty String password, String confirmPassword, String firstName, String lastName, double balance, BankAccount bankAccount, List<Connection> connections, List<Transaction> debits, List<Transaction> credits) {
@@ -87,9 +87,9 @@ public class User extends Login {
         this.lastName = lastName;
         this.balance = balance;
         this.bankAccount = bankAccount;
-        this.connections = connections;
+        /*this.connections = connections;
         this.debits = debits;
-        this.credits = credits;
+        this.credits = credits;*/
     }
 
     public User(UserProfile userProfile) {
