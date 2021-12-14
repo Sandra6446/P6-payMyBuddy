@@ -27,7 +27,7 @@ public class LoginService {
         this.userEntityRepository = userEntityRepository;
     }
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public ResponseEntity<String> checkLogin(Login login) {
         boolean authorized = false;
         Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(login.getEmail());
