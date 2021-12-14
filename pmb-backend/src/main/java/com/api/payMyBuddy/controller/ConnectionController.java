@@ -1,5 +1,6 @@
 package com.api.payMyBuddy.controller;
 
+import com.api.payMyBuddy.exceptions.APIRuntimeException;
 import com.api.payMyBuddy.model.front.Connection;
 import com.api.payMyBuddy.service.ConnectionService;
 import io.swagger.annotations.ApiOperation;
@@ -21,12 +22,14 @@ public class ConnectionController extends ValidationClass {
     @ApiOperation("Adds connection in database")
     @PostMapping
     public ResponseEntity<String> addConnection(@RequestBody Connection connection) {
-        if (isNotValid(connection)) {
+        if (isNotValid(connection) || connection.getUserEmail().equals(connection.getConnectionEmail())) {
             return new ResponseEntity<>("Error in request body", HttpStatus.BAD_REQUEST);
-        } else if (connection.getUserEmail().equals(connection.getConnectionEmail())) {
-            return new ResponseEntity<>("Emails have to be different", HttpStatus.BAD_REQUEST);
         } else {
-            return connectionService.createConnection(connection);
+            try {
+                return connectionService.createConnection(connection);
+            } catch (APIRuntimeException e) {
+                return new ResponseEntity<>(e.getMessage(), e.getHttpStatus());
+            }
         }
     }
 
@@ -36,7 +39,11 @@ public class ConnectionController extends ValidationClass {
         if (isEmpty(email)) {
             return new ResponseEntity<>("Error in request body", HttpStatus.BAD_REQUEST);
         } else {
-            return connectionService.getConnections(email);
+            try {
+                return connectionService.getConnections(email);
+            } catch (APIRuntimeException e) {
+                return new ResponseEntity<>(e.getMessage(), e.getHttpStatus());
+            }
         }
     }
 }
