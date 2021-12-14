@@ -1,7 +1,6 @@
 package com.api.payMyBuddy.controller;
 
 import com.api.payMyBuddy.model.front.Connection;
-import com.api.payMyBuddy.model.requestBody.ConnectionBody;
 import com.api.payMyBuddy.service.ConnectionService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -39,28 +38,28 @@ class ConnectionControllerTest {
     void addConnection() throws Exception {
 
         // Test to add a ConnectionBody
-        ConnectionBody connectionBody = new ConnectionBody(userEmail, "connectionEmail@email.com");
+        Connection connection = new Connection(userEmail, "connectionEmail@email.com","Madame Test");
         String response = "Connection added";
 
         Mockito.when(connectionService.createConnection(ArgumentMatchers.any(Connection.class))).thenReturn(new ResponseEntity<>(response, HttpStatus.CREATED));
         mockMvc.perform(MockMvcRequestBuilders.post("/connection")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(connectionBody.toString()))
+                        .content(connection.toString()))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.content().string(response));
 
         // Test to add an empty ConnectionBody
-        ConnectionBody connectionBodyEmpty = new ConnectionBody("","");
+        Connection connectionEmpty = new Connection();
         mockMvc.perform(MockMvcRequestBuilders.post("/connection")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(connectionBodyEmpty.toString()))
+                        .content(connectionEmpty.toString()))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
 
         // Test to add current user as connection
-        ConnectionBody connectionBodySame = new ConnectionBody(userEmail,userEmail);
+        Connection connectionSame = connection;
         mockMvc.perform(MockMvcRequestBuilders.post("/connection")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(connectionBodySame.toString()))
+                        .content(connectionSame.toString()))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 

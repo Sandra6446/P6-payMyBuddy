@@ -1,6 +1,8 @@
 package com.api.payMyBuddy.service;
 
 import com.api.payMyBuddy.controller.UserController;
+import com.api.payMyBuddy.exceptions.AlreadyInDatabaseException;
+import com.api.payMyBuddy.exceptions.NotFoundInDatabaseException;
 import com.api.payMyBuddy.model.entity.UserEntity;
 import com.api.payMyBuddy.model.front.User;
 import com.api.payMyBuddy.model.repository.UserEntityRepository;
@@ -11,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -23,7 +27,8 @@ public class UserService {
     @Autowired
     private UserEntityRepository userEntityRepository;
 
-    public ResponseEntity<Object> createUser(User user) {
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public ResponseEntity<Object> createUser(User user) throws RuntimeException {
         if (user.getConfirmPassword().isEmpty()) {
             logger.error("The two passwords are required");
             return new ResponseEntity<>("The two passwords are required", HttpStatus.BAD_REQUEST);
@@ -32,43 +37,33 @@ public class UserService {
             return new ResponseEntity<>("The two passwords are different", HttpStatus.BAD_REQUEST);
         } else {
             Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(user.getEmail());
-            if (!userEntityOptional.isEmpty()) {
-                logger.error("User already In Database");
-                return new ResponseEntity<>("User already registered", HttpStatus.CONFLICT);
+            if (userEntityOptional.isPresent()) {
+                logger.error(String.format("User %s already in database", user.getEmail()));
+                throw new AlreadyInDatabaseException("User already in database");
             } else {
                 UserEntity userEntity = new UserEntity(user);
                 userEntityRepository.saveAndFlush(userEntity);
-                logger.info("User " + user.getEmail() + " created");
-                return new ResponseEntity<>("User " + user.getEmail() + " created", HttpStatus.CREATED);
+                logger.info(String.format("User created : %s", user));
+                return new ResponseEntity<>("User created", HttpStatus.CREATED);
             }
         }
     }
 
-    public ResponseEntity<Object> readUserByEmail(String user_email) {
-        Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(user_email);
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
+    public ResponseEntity<Object> getUser(String email) throws RuntimeException {
+        Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(email);
         if (userEntityOptional.isEmpty()) {
-            logger.error("User not found");
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+            logger.error(String.format("User %s not found", email));
+            throw new NotFoundInDatabaseException("User not found");
         } else {
             User user = new User(userEntityOptional.get());
+            logger.info(user.toString());
             return ResponseEntity.ok(user);
         }
     }
 
-    public ResponseEntity<Object> getBalance(String user_email) {
-        Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(user_email);
-        if (userEntityOptional.isEmpty()) {
-            logger.error("User not found");
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
-        } else {
-            User user = new User(userEntityOptional.get());
-            String balance = "{\"balance\": " + user.getBalance() + "}";
-            return ResponseEntity.ok(balance);
-        }
-    }
-
-    // TODO Vérifier création User avec changement de mail
-    public ResponseEntity<Object> updateUser(String email, User user) {
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public ResponseEntity<Object> updateUser(String email, User user) throws RuntimeException {
         if (!user.getPassword().isEmpty() && user.getConfirmPassword().isEmpty()) {
             logger.error("Confirm password is required");
             return new ResponseEntity<>("Confirm password is required", HttpStatus.BAD_REQUEST);
@@ -76,16 +71,22 @@ public class UserService {
             logger.error("The two passwords are different");
             return new ResponseEntity<>("The two passwords are different", HttpStatus.BAD_REQUEST);
         } else {
-            Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(email);
-            if (userEntityOptional.isEmpty()) {
-                logger.error("User not found");
-                return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+            Optional<UserEntity> newUserOptional = userEntityRepository.findByEmail(user.getEmail());
+            if (newUserOptional.isPresent()) {
+                logger.error(String.format("Email %s already in database", user.getEmail()));
+                throw new AlreadyInDatabaseException("New email not valid");
             } else {
-                UserEntity userEntity = userEntityOptional.get();
-                userEntity.update(user);
-                userEntityRepository.saveAndFlush(userEntity);
-                logger.info("User " + user.getEmail() + " updated");
-                return ResponseEntity.ok("User " + user.getEmail() + " updated");
+                Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(email);
+                if (userEntityOptional.isEmpty()) {
+                    logger.error(String.format("User %s not found", email));
+                    throw new NotFoundInDatabaseException("User not found");
+                } else {
+                    UserEntity userEntity = userEntityOptional.get();
+                    userEntity.update(user);
+                    userEntityRepository.saveAndFlush(userEntity);
+                    logger.info(String.format("User updated : %s", user));
+                    return ResponseEntity.ok("Profile updated");
+                }
             }
         }
     }

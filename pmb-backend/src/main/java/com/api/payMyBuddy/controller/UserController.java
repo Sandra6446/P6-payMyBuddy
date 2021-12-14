@@ -1,5 +1,6 @@
 package com.api.payMyBuddy.controller;
 
+import com.api.payMyBuddy.exceptions.APIRuntimeException;
 import com.api.payMyBuddy.model.front.User;
 import com.api.payMyBuddy.service.UserService;
 import io.swagger.annotations.ApiOperation;
@@ -21,20 +22,14 @@ public class UserController extends ValidationClass {
     @ApiOperation("Adds a user in database")
     @PostMapping
     public ResponseEntity<Object> addUser(@RequestBody User user) {
-        if(isNotValid(user)) {
+        if (isNotValid(user)) {
             return new ResponseEntity<>("Error in request body", HttpStatus.BAD_REQUEST);
         } else {
-            return userService.createUser(user);
-        }
-    }
-
-    @ApiOperation("Gets a user balance")
-    @GetMapping("/{email}/balance")
-    public ResponseEntity<Object> getBalance(@PathVariable String email) {
-        if (isEmpty(email)) {
-            return new ResponseEntity<>("Error in request body", HttpStatus.BAD_REQUEST);
-        } else {
-            return userService.getBalance(email);
+            try {
+                return userService.createUser(user);
+            } catch (APIRuntimeException e) {
+                return new ResponseEntity<>(e.getMessage(), e.getHttpStatus());
+            }
         }
     }
 
@@ -44,17 +39,25 @@ public class UserController extends ValidationClass {
         if (isEmpty(email)) {
             return new ResponseEntity<>("Error in request body", HttpStatus.BAD_REQUEST);
         } else {
-            return userService.readUserByEmail(email);
+            try {
+                return userService.getUser(email);
+            } catch (APIRuntimeException e) {
+                return new ResponseEntity<>(e.getMessage(), e.getHttpStatus());
+            }
         }
     }
 
     @ApiOperation("Updates a user")
     @PutMapping("/{email}")
     public ResponseEntity<Object> updateUser(@PathVariable String email, @RequestBody User user) {
-        if(isNotValid(user)) {
+        if (isNotValid(user)) {
             return new ResponseEntity<>("Error in request body", HttpStatus.BAD_REQUEST);
         } else {
-            return userService.updateUser(email,user);
+            try {
+                return userService.updateUser(email, user);
+            } catch (APIRuntimeException e) {
+                return new ResponseEntity<>(e.getMessage(), e.getHttpStatus());
+            }
         }
     }
 }

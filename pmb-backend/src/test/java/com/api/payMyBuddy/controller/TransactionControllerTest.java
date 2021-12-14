@@ -1,7 +1,6 @@
 package com.api.payMyBuddy.controller;
 
 import com.api.payMyBuddy.model.front.Transaction;
-import com.api.payMyBuddy.model.requestBody.TransactionBody;
 import com.api.payMyBuddy.service.TransactionService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -74,7 +73,7 @@ class TransactionControllerTest {
     void addTransaction() throws Exception {
 
         // Test to add a TransactionBody
-        TransactionBody transactionBody = new TransactionBody(userEmail, "connectionEmail@email.com","My transactions",10);
+        Transaction transactionBody = new Transaction(userEmail, "connectionEmail@email.com","Madame Test", "My transactions", Transaction.Type.DEBIT,10,LocalDateTime.now());
         String response = "Transaction added";
 
         Mockito.when(transactionService.createTransaction(ArgumentMatchers.any(Transaction.class))).thenReturn(new ResponseEntity<>(response, HttpStatus.CREATED));
@@ -85,17 +84,17 @@ class TransactionControllerTest {
                 .andExpect(MockMvcResultMatchers.content().string(response));
 
         // Test to add an empty TransactionBody
-        TransactionBody transactionBodyEmpty = new TransactionBody();
+        Transaction transactionEmpty = new Transaction();
         mockMvc.perform(MockMvcRequestBuilders.post("/transaction")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(transactionBodyEmpty.toString()))
+                        .content(transactionEmpty.toString()))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
 
         // Test to add a transaction with current user
-        TransactionBody transactionBodySame = new TransactionBody(userEmail,userEmail,"Description",10);
+        Transaction transactionSame = transaction;
         mockMvc.perform(MockMvcRequestBuilders.post("/transaction")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(transactionBodySame.toString()))
+                        .content(transactionSame.toString()))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 }
