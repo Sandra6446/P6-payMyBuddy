@@ -1,6 +1,6 @@
 package com.api.payMyBuddy.controller;
 
-import com.api.payMyBuddy.model.requestBody.ConnectionBody;
+import com.api.payMyBuddy.model.front.Connection;
 import com.api.payMyBuddy.service.ConnectionService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -20,13 +20,13 @@ public class ConnectionController extends ValidationClass {
 
     @ApiOperation("Adds connection in database")
     @PostMapping
-    public ResponseEntity<String> addConnection(@RequestBody ConnectionBody connectionBody) {
-        if (isNotValid(connectionBody)) {
+    public ResponseEntity<String> addConnection(@RequestBody Connection connection) {
+        if (isNotValid(connection)) {
             return new ResponseEntity<>("Error in request body", HttpStatus.BAD_REQUEST);
-        } else if (connectionBody.getUserEmail().equals(connectionBody.getConnectionEmail())) {
+        } else if (connection.getUserEmail().equals(connection.getConnectionEmail())) {
             return new ResponseEntity<>("Emails have to be different", HttpStatus.BAD_REQUEST);
         } else {
-            return connectionService.createConnection(connectionBody);
+            return connectionService.createConnection(connection);
         }
     }
 

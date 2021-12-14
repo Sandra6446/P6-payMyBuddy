@@ -1,6 +1,6 @@
 package com.api.payMyBuddy.controller;
 
-import com.api.payMyBuddy.model.requestBody.TransactionBody;
+import com.api.payMyBuddy.model.front.Transaction;
 import com.api.payMyBuddy.service.TransactionService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -40,13 +40,13 @@ public class TransactionController extends ValidationClass {
 
     @ApiOperation("Adds a transaction for a user")
     @PostMapping
-    public ResponseEntity<String> addTransaction(@RequestBody TransactionBody transactionBody) {
-        if (isNotValid(transactionBody)) {
+    public ResponseEntity<String> addTransaction(@RequestBody Transaction transaction) {
+        if (isNotValid(transaction)) {
             return new ResponseEntity<>("Error in request body", HttpStatus.BAD_REQUEST);
-        } else if (transactionBody.getUserEmail().equals(transactionBody.getConnectionEmail())) {
+        } else if (transaction.getUserEmail().equals(transaction.getConnectionEmail())) {
             return new ResponseEntity<>("Emails have to be different", HttpStatus.BAD_REQUEST);
         } else {
-            return transactionService.createTransaction(transactionBody);
+            return transactionService.createTransaction(transaction);
         }
     }
 

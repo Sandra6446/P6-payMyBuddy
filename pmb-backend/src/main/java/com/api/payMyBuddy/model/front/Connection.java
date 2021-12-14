@@ -1,7 +1,7 @@
 package com.api.payMyBuddy.model.front;
 
 import com.api.payMyBuddy.model.entity.ConnectionEntity;
-import com.api.payMyBuddy.model.entity.UserEntity;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
 
@@ -16,20 +16,19 @@ public class Connection {
 
     @NotNull
     @NotEmpty
-    String email;
+    private String userEmail;
 
     @NotNull
     @NotEmpty
-    String name;
+    private String connectionEmail;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String name;
 
     public Connection(ConnectionEntity connectionEntity) {
-        this.setEmail(connectionEntity.getConnectionPrimaryKey().getUserEntityConnection().getEmail());
+        this.setUserEmail(connectionEntity.getConnectionPrimaryKey().getUserEntity().getEmail());
+        this.setConnectionEmail(connectionEntity.getConnectionPrimaryKey().getUserEntityConnection().getEmail());
         this.setName(String.format("%s %s", connectionEntity.getConnectionPrimaryKey().getUserEntityConnection().getFirstName(), connectionEntity.getConnectionPrimaryKey().getUserEntityConnection().getLastName()));
-    }
-
-    public Connection(UserEntity userEntity) {
-        this.setEmail(userEntity.getEmail());
-        this.setName(String.format("%s %s",userEntity.getFirstName(),userEntity.getLastName()));
     }
 
     @SneakyThrows

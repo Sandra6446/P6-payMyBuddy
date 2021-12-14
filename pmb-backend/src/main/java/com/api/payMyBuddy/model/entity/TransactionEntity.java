@@ -1,6 +1,6 @@
 package com.api.payMyBuddy.model.entity;
 
-import com.api.payMyBuddy.model.requestBody.TransactionBody;
+import com.api.payMyBuddy.model.front.Transaction;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -33,13 +33,13 @@ public class TransactionEntity {
     @Column(name="facture_id")
     private String bill;
 
-    public TransactionEntity(UserEntity userEntity, UserEntity userEntityConnection, TransactionBody transactionBody) {
+    public TransactionEntity(UserEntity userEntity, UserEntity userEntityConnection, Transaction transaction) {
         TransactionPrimaryKey primaryKey = new TransactionPrimaryKey();
         primaryKey.setUserEntity(userEntity);
         primaryKey.setUserEntityConnection(userEntityConnection);
         primaryKey.setDate(LocalDateTime.now());
         this.setTransferPrimaryKey(primaryKey);
-        this.setAmount(transactionBody.getAmount());
-        this.setDescription(transactionBody.getDescription());
+        this.setAmount(transaction.getAmount());
+        this.setDescription(transaction.getDescription());
     }
 }

@@ -42,7 +42,7 @@ class ConnectionControllerTest {
         ConnectionBody connectionBody = new ConnectionBody(userEmail, "connectionEmail@email.com");
         String response = "Connection added";
 
-        Mockito.when(connectionService.createConnection(ArgumentMatchers.any(ConnectionBody.class))).thenReturn(new ResponseEntity<>(response, HttpStatus.CREATED));
+        Mockito.when(connectionService.createConnection(ArgumentMatchers.any(Connection.class))).thenReturn(new ResponseEntity<>(response, HttpStatus.CREATED));
         mockMvc.perform(MockMvcRequestBuilders.post("/connection")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(connectionBody.toString()))
@@ -67,7 +67,7 @@ class ConnectionControllerTest {
     @Test
     void getConnections() throws Exception {
 
-        Connection connection = new Connection(userEmail, "UserTest");
+        Connection connection = new Connection(userEmail, "UserTest","Mr Tesr");
 
         // Test to get all connections of a user
         Mockito.when(connectionService.getConnections(ArgumentMatchers.anyString())).thenReturn(ResponseEntity.ok(connection));

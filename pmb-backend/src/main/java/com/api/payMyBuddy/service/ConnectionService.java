@@ -2,9 +2,9 @@ package com.api.payMyBuddy.service;
 
 import com.api.payMyBuddy.model.entity.ConnectionEntity;
 import com.api.payMyBuddy.model.entity.UserEntity;
+import com.api.payMyBuddy.model.front.Connection;
 import com.api.payMyBuddy.model.repository.ConnectionEntityRepository;
 import com.api.payMyBuddy.model.repository.UserEntityRepository;
-import com.api.payMyBuddy.model.requestBody.ConnectionBody;
 import com.api.payMyBuddy.service.mapper.MapperConnection;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -31,16 +31,16 @@ public class ConnectionService {
     @Autowired
     MapperConnection mapperConnection;
 
-    public ResponseEntity<String> createConnection(ConnectionBody connectionBody) {
+    public ResponseEntity<String> createConnection(Connection connection) {
         String message = "";
-        Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(connectionBody.getUserEmail());
+        Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(connection.getUserEmail());
         if (userEntityOptional.isEmpty()) {
             message = "User not found";
             logger.error(message);
             return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
         } else {
             UserEntity userEntity = userEntityOptional.get();
-            Optional<UserEntity> userEntityConnectionOptional = userEntityRepository.findByEmail(connectionBody.getConnectionEmail());
+            Optional<UserEntity> userEntityConnectionOptional = userEntityRepository.findByEmail(connection.getConnectionEmail());
             if (userEntityConnectionOptional.isEmpty()) {
                 message = "Connection not found";
                 logger.error(message);
@@ -54,7 +54,7 @@ public class ConnectionService {
                     return new ResponseEntity<>(message, HttpStatus.CONFLICT);
                 } else {
                     connectionEntityRepository.saveAndFlush(connectionEntity);
-                    message = "Connection " + connectionBody.getConnectionEmail() + " added for " + connectionBody.getUserEmail();
+                    message = "Connection " + connection.getConnectionEmail() + " added for " + connection.getUserEmail();
                     logger.info(message);
                     return new ResponseEntity<>(message, HttpStatus.CREATED);
                 }

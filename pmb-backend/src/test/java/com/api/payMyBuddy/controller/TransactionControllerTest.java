@@ -1,6 +1,5 @@
 package com.api.payMyBuddy.controller;
 
-import com.api.payMyBuddy.model.front.Connection;
 import com.api.payMyBuddy.model.front.Transaction;
 import com.api.payMyBuddy.model.requestBody.TransactionBody;
 import com.api.payMyBuddy.service.TransactionService;
@@ -37,7 +36,7 @@ class TransactionControllerTest {
     @BeforeAll
     private static void setUp() {
         userEmail = "userEmail@email.com";
-        transaction = new Transaction(new Connection("userEmail@email.com","test"), "My transaction", 100, LocalDateTime.now());
+        transaction = new Transaction(userEmail,"connection@email.com", "Monsieur TEST","My transaction", Transaction.Type.DEBIT, 100, LocalDateTime.now());
     }
 
     @Test
@@ -78,7 +77,7 @@ class TransactionControllerTest {
         TransactionBody transactionBody = new TransactionBody(userEmail, "connectionEmail@email.com","My transactions",10);
         String response = "Transaction added";
 
-        Mockito.when(transactionService.createTransaction(ArgumentMatchers.any(TransactionBody.class))).thenReturn(new ResponseEntity<>(response, HttpStatus.CREATED));
+        Mockito.when(transactionService.createTransaction(ArgumentMatchers.any(Transaction.class))).thenReturn(new ResponseEntity<>(response, HttpStatus.CREATED));
         mockMvc.perform(MockMvcRequestBuilders.post("/transaction")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(transactionBody.toString()))
