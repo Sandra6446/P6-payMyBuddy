@@ -1,5 +1,6 @@
 package com.api.payMyBuddy.controller;
 
+import com.api.payMyBuddy.exceptions.APIRuntimeException;
 import com.api.payMyBuddy.model.front.Transaction;
 import com.api.payMyBuddy.service.TransactionService;
 import io.swagger.annotations.ApiOperation;
@@ -24,7 +25,11 @@ public class TransactionController extends ValidationClass {
         if (isEmpty(email)) {
             return new ResponseEntity<>("Error in request body", HttpStatus.BAD_REQUEST);
         } else {
-            return transactionService.getAllTransactions(email);
+            try {
+                return transactionService.getAllTransactions(email);
+            } catch (APIRuntimeException e) {
+                return new ResponseEntity<>(e.getMessage(), e.getHttpStatus());
+            }
         }
     }
 
@@ -34,7 +39,11 @@ public class TransactionController extends ValidationClass {
         if (isEmpty(email)) {
             return new ResponseEntity<>("Error in request body", HttpStatus.BAD_REQUEST);
         } else {
-            return transactionService.getMyTransactions(email);
+            try {
+                return transactionService.getMyTransactions(email);
+            } catch (APIRuntimeException e) {
+                return new ResponseEntity<>(e.getMessage(), e.getHttpStatus());
+            }
         }
     }
 
@@ -46,7 +55,11 @@ public class TransactionController extends ValidationClass {
         } else if (transaction.getUserEmail().equals(transaction.getConnectionEmail())) {
             return new ResponseEntity<>("Emails have to be different", HttpStatus.BAD_REQUEST);
         } else {
-            return transactionService.createTransaction(transaction);
+            try {
+                return transactionService.createTransaction(transaction);
+            } catch (APIRuntimeException e) {
+                return new ResponseEntity<>(e.getMessage(), e.getHttpStatus());
+            }
         }
     }
 

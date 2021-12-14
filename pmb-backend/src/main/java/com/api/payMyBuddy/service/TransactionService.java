@@ -1,6 +1,7 @@
 package com.api.payMyBuddy.service;
 
 import com.api.payMyBuddy.controller.UserController;
+import com.api.payMyBuddy.exceptions.NotFoundInDatabaseException;
 import com.api.payMyBuddy.model.entity.TransactionEntity;
 import com.api.payMyBuddy.model.entity.UserEntity;
 import com.api.payMyBuddy.model.front.Transaction;
@@ -13,7 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -32,58 +36,50 @@ public class TransactionService {
     @Autowired
     private UserService userService;
 
-    public ResponseEntity<Object> getMyTransactions(String user_email) {
-        String message = "";
-        Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(user_email);
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
+    public ResponseEntity<Object> getMyTransactions(String email) {
+        Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(email);
         if (userEntityOptional.isEmpty()) {
-            message = "User not found";
-            logger.error(message);
-            return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+            logger.error(String.format("User %s not found", email));
+            throw new NotFoundInDatabaseException("User not found");
         } else {
-            return ResponseEntity.ok(mapperTransaction.getDebits(userEntityOptional.get()));
+            List<Transaction> debits = mapperTransaction.getDebits(userEntityOptional.get());
+            logger.info("Debits found");
+            return ResponseEntity.ok(debits);
         }
     }
 
-    public ResponseEntity<Object> getAllTransactions(String user_email) {
-        String message = "";
-        Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(user_email);
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
+    public ResponseEntity<Object> getAllTransactions(String email) {
+        Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(email);
         if (userEntityOptional.isEmpty()) {
-            message = "User not found";
-            logger.error(message);
-            return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+            logger.error(String.format("User %s not found", email));
+            throw new NotFoundInDatabaseException("User not found");
         } else {
-            UserEntity userEntity = userEntityOptional.get();
-            return ResponseEntity.ok(mapperTransaction.getAllTransactions(userEntity));
+            List<Transaction> transactions = mapperTransaction.getAllTransactions(userEntityOptional.get());
+            logger.info("Transactions found");
+            return ResponseEntity.ok(transactions);
         }
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public ResponseEntity<String> createTransaction(Transaction transaction) {
-        String message = "";
         Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(transaction.getUserEmail());
         if (userEntityOptional.isEmpty()) {
-            message = "User not found";
-            logger.error(message);
-            return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+            logger.error(String.format("User %s not found", transaction.getUserEmail()));
+            throw new NotFoundInDatabaseException("User not found");
         } else {
             UserEntity userEntity = userEntityOptional.get();
             Optional<UserEntity> userEntityConnectionOptional = userEntityRepository.findByEmail(transaction.getConnectionEmail());
             if (userEntityConnectionOptional.isEmpty()) {
-                message = "Connection not found";
-                logger.error(message);
-                return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+                logger.error(String.format("Connection %s not found", transaction.getConnectionEmail()));
+                throw new NotFoundInDatabaseException("Connection not found");
             } else {
                 UserEntity userEntityConnection = userEntityConnectionOptional.get();
-                TransactionEntity transactionEntity = new TransactionEntity(userEntity,userEntityConnection,transaction);
-                if (userEntity.getDebits().contains(transactionEntity)) {
-                    message = "Transaction already registered";
-                    logger.error(message);
-                    return new ResponseEntity<>(message, HttpStatus.CONFLICT);
-                } else {
-                    transactionEntityRepository.saveAndFlush(transactionEntity);
-                    message = "Transaction added for " + userEntity.getEmail();
-                    logger.info(message);
-                    return new ResponseEntity<>(message, HttpStatus.CREATED);
-                }
+                TransactionEntity transactionEntity = new TransactionEntity(userEntity, userEntityConnection, transaction);
+                transactionEntityRepository.saveAndFlush(transactionEntity);
+                logger.info(String.format("User %s : Transaction %s registered",transaction.getUserEmail(),transaction));
+                return new ResponseEntity<>("Transaction added", HttpStatus.CREATED);
             }
         }
     }

@@ -56,7 +56,7 @@ public class ConnectionService {
                     throw new AlreadyInDatabaseException("Connection already registered");
                 } else {
                     connectionEntityRepository.saveAndFlush(connectionEntity);
-                    logger.info(String.format("Connection %s added for user %s", connection.getConnectionEmail(), connection.getUserEmail()));
+                    logger.info(String.format("User %s : Connection %s added", connection.getUserEmail(),connection));
                     return new ResponseEntity<>("Connection added", HttpStatus.CREATED);
                 }
             }
