@@ -1,5 +1,6 @@
 package com.api.payMyBuddy.controller;
 
+import com.api.payMyBuddy.exceptions.APIRuntimeException;
 import com.api.payMyBuddy.model.front.Login;
 import com.api.payMyBuddy.service.LoginService;
 import io.swagger.annotations.ApiOperation;
@@ -24,7 +25,11 @@ public class LoginController extends ValidationClass {
         if (isNotValid(login)) {
             return new ResponseEntity<>("Error in request body", HttpStatus.BAD_REQUEST);
         } else {
-            return loginService.checkLogin(login);
+            try {
+                return loginService.checkLogin(login);
+            } catch (APIRuntimeException e) {
+                return new ResponseEntity<>(e.getMessage(),e.getHttpStatus());
+            }
         }
     }
 }

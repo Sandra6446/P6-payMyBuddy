@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Getter
@@ -13,9 +14,11 @@ import javax.validation.constraints.NotNull;
 public class Login {
 
     @NotNull
+    @NotEmpty
     private String email;
 
     @NotNull
+    @NotEmpty
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 

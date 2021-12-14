@@ -1,8 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.api.payMyBuddy.service.LoginServiceTest
--------------------------------------------------------------------------------
-Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.276 s <<< FAILURE! - in com.api.payMyBuddy.service.LoginServiceTest
-checkLogin  Time elapsed: 0.033 s  <<< FAILURE!
-org.opentest4j.AssertionFailedError: expected: <<200 OK OK,User user@email.com authorized.,[]>> but was: <<401 UNAUTHORIZED Unauthorized,Email or password incorrect,[]>>
-	at com.api.payMyBuddy.service.LoginServiceTest.checkLogin(LoginServiceTest.java:50)
-
