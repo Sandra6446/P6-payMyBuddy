@@ -4,24 +4,25 @@ import com.api.payMyBuddy.exceptions.APIRuntimeException;
 import com.api.payMyBuddy.model.front.Transaction;
 import com.api.payMyBuddy.service.TransactionService;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "http://localhost:8090")
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/transaction")
+@RequestMapping("/api/transaction")
 @RequiredArgsConstructor
 public class TransactionController extends ValidationClass {
 
     @Autowired
     private final TransactionService transactionService;
 
-    @ApiOperation("Gets transactions made by a user")
+    @ApiOperation(value = "Gets all transactions of a user", authorizations = { @Authorization(value="jwtToken") })
     @GetMapping("/{email}")
-    public ResponseEntity<Object> getAllTransactions(@PathVariable String email) {
+    public ResponseEntity<?> getAllTransactions(@PathVariable String email) {
         if (isEmpty(email)) {
             return new ResponseEntity<>("Error in request body", HttpStatus.BAD_REQUEST);
         } else {
@@ -33,9 +34,9 @@ public class TransactionController extends ValidationClass {
         }
     }
 
-    @ApiOperation("Gets transactions made by a user")
+    @ApiOperation(value = "Gets transactions made by a user", authorizations = { @Authorization(value="jwtToken") })
     @GetMapping("/{email}/myTransactions")
-    public ResponseEntity<Object> getTransactions(@PathVariable String email) {
+    public ResponseEntity<?> getTransactions(@PathVariable String email) {
         if (isEmpty(email)) {
             return new ResponseEntity<>("Error in request body", HttpStatus.BAD_REQUEST);
         } else {
@@ -47,9 +48,9 @@ public class TransactionController extends ValidationClass {
         }
     }
 
-    @ApiOperation("Adds a transaction for a user")
+    @ApiOperation(value = "Adds a transaction for a user", authorizations = { @Authorization(value="jwtToken") })
     @PostMapping
-    public ResponseEntity<String> addTransaction(@RequestBody Transaction transaction) {
+    public ResponseEntity<?> addTransaction(@RequestBody Transaction transaction) {
         if (isNotValid(transaction)) {
             return new ResponseEntity<>("Error in request body", HttpStatus.BAD_REQUEST);
         } else if (transaction.getUserEmail().equals(transaction.getConnectionEmail())) {

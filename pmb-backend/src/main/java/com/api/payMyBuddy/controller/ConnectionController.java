@@ -10,9 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "http://localhost:8090")
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/connection")
+@RequestMapping("/api/connection")
 @RequiredArgsConstructor
 public class ConnectionController extends ValidationClass {
 
@@ -21,7 +21,7 @@ public class ConnectionController extends ValidationClass {
 
     @ApiOperation("Adds connection in database")
     @PostMapping
-    public ResponseEntity<String> addConnection(@RequestBody Connection connection) {
+    public ResponseEntity<?> addConnection(@RequestBody Connection connection) {
         if (isNotValid(connection) || connection.getUserEmail().equals(connection.getConnectionEmail())) {
             return new ResponseEntity<>("Error in request body", HttpStatus.BAD_REQUEST);
         } else {
@@ -35,7 +35,7 @@ public class ConnectionController extends ValidationClass {
 
     @ApiOperation("Gets connections of a user")
     @GetMapping("/{email}")
-    public ResponseEntity<Object> getConnections(@PathVariable String email) {
+    public ResponseEntity<?> getConnections(@PathVariable String email) {
         if (isEmpty(email)) {
             return new ResponseEntity<>("Error in request body", HttpStatus.BAD_REQUEST);
         } else {

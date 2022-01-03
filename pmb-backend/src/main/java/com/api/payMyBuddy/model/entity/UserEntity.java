@@ -1,6 +1,7 @@
 package com.api.payMyBuddy.model.entity;
 
 import com.api.payMyBuddy.model.front.User;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
@@ -15,13 +16,14 @@ import java.util.List;
 @Table(name = "utilisateur")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @DynamicUpdate
 public class UserEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int userId;
+    private int id;
 
     @NotNull
     private String email;
@@ -54,25 +56,10 @@ public class UserEntity implements Serializable {
     @OneToMany(mappedBy = "transferPrimaryKey.userEntityConnection")
     private List<TransactionEntity> credits = new ArrayList<>();
 
-    public UserEntity(String email, String firstName, String lastName, String password, double balance, String bank, String iban, String bic, List<ConnectionEntity> connectionEntities, List<TransactionEntity> debits, List<TransactionEntity> credits) {
-        this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.password = password;
-        this.balance = balance;
-        this.bank = bank;
-        this.iban = iban;
-        this.bic = bic;
-        this.connectionEntities = connectionEntities;
-        this.debits = debits;
-        this.credits = credits;
-    }
-
     public UserEntity(User user) {
         this.setEmail(user.getEmail());
         this.setFirstName(user.getFirstName());
         this.setLastName(user.getLastName());
-        this.setPassword(user.getPassword());
         this.setBank(user.getBankAccount().getBank());
         this.setBic(user.getBankAccount().getBic());
         this.setIban(user.getBankAccount().getIban());
@@ -88,9 +75,6 @@ public class UserEntity implements Serializable {
         if (!user.getLastName().isEmpty()) {
             this.setLastName(user.getLastName());
         }
-        if (!user.getPassword().isEmpty()) {
-            this.setPassword(user.getPassword());
-        }
         if (!user.getBankAccount().getBank().isEmpty()) {
             this.setBank(user.getBankAccount().getBank());
         }
@@ -100,6 +84,11 @@ public class UserEntity implements Serializable {
         if (!user.getBankAccount().getBic().isEmpty()) {
             this.setBic(user.getBankAccount().getBic());
         }
+    }
+
+    public void updateBalance (int amount) {
+        double newAmount = this.getBalance()+amount;
+        this.setBalance(newAmount);
     }
 
 }

@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Transaction {
 
-    public enum Type {DEBIT,CREDIT};
+    public enum Type {DEBIT,CREDIT}
 
     @NotNull
     @NotEmpty

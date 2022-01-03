@@ -4,6 +4,7 @@ import com.api.payMyBuddy.controller.UserController;
 import com.api.payMyBuddy.exceptions.AlreadyInDatabaseException;
 import com.api.payMyBuddy.exceptions.NotFoundInDatabaseException;
 import com.api.payMyBuddy.model.entity.UserEntity;
+import com.api.payMyBuddy.model.front.Login;
 import com.api.payMyBuddy.model.front.User;
 import com.api.payMyBuddy.model.repository.UserEntityRepository;
 import lombok.AllArgsConstructor;
@@ -12,6 +13,9 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,9 +24,12 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private static final Logger logger = LogManager.getLogger(UserController.class);
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @Autowired
     private UserEntityRepository userEntityRepository;
@@ -42,6 +49,7 @@ public class UserService {
                 throw new AlreadyInDatabaseException("User already in database");
             } else {
                 UserEntity userEntity = new UserEntity(user);
+                userEntity.setPassword(passwordEncoder.encode(user.getPassword()));
                 userEntityRepository.saveAndFlush(userEntity);
                 logger.info(String.format("User created : %s", user));
                 return new ResponseEntity<>("User created", HttpStatus.CREATED);
@@ -71,24 +79,34 @@ public class UserService {
             logger.error("The two passwords are different");
             return new ResponseEntity<>("The two passwords are different", HttpStatus.BAD_REQUEST);
         } else {
-            Optional<UserEntity> newUserOptional = userEntityRepository.findByEmail(user.getEmail());
-            if (newUserOptional.isPresent()) {
-                logger.error(String.format("Email %s already in database", user.getEmail()));
-                throw new AlreadyInDatabaseException("New email not valid");
-            } else {
-                Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(email);
-                if (userEntityOptional.isEmpty()) {
-                    logger.error(String.format("User %s not found", email));
-                    throw new NotFoundInDatabaseException("User not found");
-                } else {
-                    UserEntity userEntity = userEntityOptional.get();
-                    userEntity.update(user);
-                    userEntityRepository.saveAndFlush(userEntity);
-                    logger.info(String.format("User updated : %s", user));
-                    return ResponseEntity.ok("Profile updated");
+            if (!user.getEmail().isEmpty() && !user.getEmail().equals(email)) {
+                Optional<UserEntity> newUserOptional = userEntityRepository.findByEmail(user.getEmail());
+                if (newUserOptional.isPresent()) {
+                    logger.error(String.format("Email %s already in database", user.getEmail()));
+                    throw new AlreadyInDatabaseException("New email not valid, please choose another email");
                 }
             }
+            Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(email);
+            if (userEntityOptional.isEmpty()) {
+                logger.error(String.format("User %s not found", email));
+                throw new NotFoundInDatabaseException("User not found");
+            } else {
+                UserEntity userEntity = userEntityOptional.get();
+                userEntity.update(user);
+                userEntity.setPassword(passwordEncoder.encode(user.getPassword()));
+                userEntityRepository.saveAndFlush(userEntity);
+                logger.info(String.format("User updated : %s", user));
+                return ResponseEntity.ok("Profile updated");
+            }
         }
+    }
+
+    @Override
+    @Transactional
+    public Login loadUserByUsername(String username) throws UsernameNotFoundException {
+        UserEntity userEntity = userEntityRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+        return Login.build(userEntity);
     }
 }
 

@@ -10,15 +10,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "http://localhost:8090")
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController extends ValidationClass {
 
     @Autowired
     private final UserService userService;
 
+    /*
     @ApiOperation("Adds a user in database")
     @PostMapping
     public ResponseEntity<Object> addUser(@RequestBody User user) {
@@ -33,9 +34,11 @@ public class UserController extends ValidationClass {
         }
     }
 
+     */
+
     @ApiOperation("Gets a user")
     @GetMapping("/{email}")
-    public ResponseEntity<Object> getUser(@PathVariable String email) {
+    public ResponseEntity<?> getUser(@PathVariable String email) {
         if (isEmpty(email)) {
             return new ResponseEntity<>("Error in request body", HttpStatus.BAD_REQUEST);
         } else {
@@ -49,15 +52,11 @@ public class UserController extends ValidationClass {
 
     @ApiOperation("Updates a user")
     @PutMapping("/{email}")
-    public ResponseEntity<Object> updateUser(@PathVariable String email, @RequestBody User user) {
-        if (isNotValid(user)) {
-            return new ResponseEntity<>("Error in request body", HttpStatus.BAD_REQUEST);
-        } else {
-            try {
-                return userService.updateUser(email, user);
-            } catch (APIRuntimeException e) {
-                return new ResponseEntity<>(e.getMessage(), e.getHttpStatus());
-            }
+    public ResponseEntity<?> updateUser(@PathVariable String email, @RequestBody User user) {
+        try {
+            return userService.updateUser(email, user);
+        } catch (APIRuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), e.getHttpStatus());
         }
     }
 }

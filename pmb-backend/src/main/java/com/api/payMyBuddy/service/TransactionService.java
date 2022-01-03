@@ -1,6 +1,7 @@
 package com.api.payMyBuddy.service;
 
 import com.api.payMyBuddy.controller.UserController;
+import com.api.payMyBuddy.exceptions.NotEnoughMoneyException;
 import com.api.payMyBuddy.exceptions.NotFoundInDatabaseException;
 import com.api.payMyBuddy.model.entity.TransactionEntity;
 import com.api.payMyBuddy.model.entity.UserEntity;
@@ -78,8 +79,16 @@ public class TransactionService {
                 UserEntity userEntityConnection = userEntityConnectionOptional.get();
                 TransactionEntity transactionEntity = new TransactionEntity(userEntity, userEntityConnection, transaction);
                 transactionEntityRepository.saveAndFlush(transactionEntity);
-                logger.info(String.format("User %s : Transaction %s registered",transaction.getUserEmail(),transaction));
-                return new ResponseEntity<>("Transaction added", HttpStatus.CREATED);
+                userEntity.updateBalance(-transactionEntity.getAmount());
+                if (userEntity.getBalance()>=0) {
+                    userEntityRepository.saveAndFlush(userEntity);
+                    logger.info(String.format("User %s : Transaction %s registered",transaction.getUserEmail(),transaction));
+                    return new ResponseEntity<>("Transaction added", HttpStatus.CREATED);
+                } else {
+                    logger.error(String.format("Balance negative : ", userEntity.getBalance()));
+                    throw new NotEnoughMoneyException("Please recharge money");
+                }
+
             }
         }
     }

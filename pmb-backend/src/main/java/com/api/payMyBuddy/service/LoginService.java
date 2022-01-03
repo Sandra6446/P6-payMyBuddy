@@ -1,22 +1,8 @@
 package com.api.payMyBuddy.service;
 
-import com.api.payMyBuddy.controller.UserController;
-import com.api.payMyBuddy.exceptions.UnauthorizedException;
-import com.api.payMyBuddy.model.entity.UserEntity;
-import com.api.payMyBuddy.model.front.Login;
-import com.api.payMyBuddy.model.repository.UserEntityRepository;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
-
+/*
 @Service
-public class LoginService {
+public class LoginService implements UserDetailsService {
 
     private static final Logger logger = LogManager.getLogger(UserController.class);
 
@@ -42,4 +28,9 @@ public class LoginService {
             throw new UnauthorizedException("Email or password incorrect");
         }
     }
+
+
 }
+
+ */
+
