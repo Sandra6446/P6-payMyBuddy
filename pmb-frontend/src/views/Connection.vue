@@ -19,14 +19,14 @@
         <MainTitle></MainTitle>
       </div>
 
-      <form class="needs-validation" @submit="onSubmit">
+      <form class="needs-validation" v-on:submit.prevent="addConnection">
         <div class="py-5">
           <div class="col-9 mx-auto">
             <label for="email" class="form-label col-11 text-start"
               >Please enter the email of the new contact :
             </label>
             <EmailInput
-              v-model="form.email"
+              v-model="connection.connectionEmail"
               label="Please enter the email of the new contact"
             ></EmailInput>
           </div>
@@ -45,7 +45,7 @@ import Header from "../components/Header.vue";
 import MainTitle from "../components/MainTitle.vue";
 import SubmitButton from "../components/SubmitButton.vue";
 import EmailInput from "../components/EmailInput.vue";
-import ConnectionService from "../services/ConnectionService";
+import ConnectionService from "../services/connection.service";
 
 export default {
   name: "Connection",
@@ -57,40 +57,37 @@ export default {
   },
   data() {
     return {
-      form: {
-        email: "",
+      connection: {
+        userEmail: "",
+        connectionEmail: "",
       },
     };
   },
-  methods: {
-    onSubmit() {
-      var data = {
-        userEmail: this.$route.params.email,
-        connectionEmail: this.form.email
-      };
-      ConnectionService.addConnection(data)
-        .then((response) => {
-          if (response.status === 201) {
-            alert(response.data);
-            this.$router.push({
-              name: "Transfer",
-              params: { email: this.$route.params.email },
-            });
-          }
-        })
-        .catch((e) => {
-          if (e.response) {
-            alert(e.response.data);
-          } else {
-            alert(e);
-          }
-        });
-    },
-  },
   mounted() {
-    if (this.$route.params.email === undefined) {
-      this.$router.replace({ name: "Login" });
+    if (this.$store.state.auth.user !== null) {
+      this.connection.userEmail = this.$store.state.auth.user.email;
+    } else {
+      this.$router.push("/login");
     }
+  },
+  methods: {
+    addConnection() {
+      ConnectionService.addConnection(this.connection).then(
+        () => {
+          alert("Connection added");
+          this.$router.push("/transfer");
+        },
+        (error) => {
+          alert(error.response.data || error.message || error.toString());
+          if (error.response.data.status === 401) {
+            this.$store.dispatch("auth/logout");
+            this.$router.push("/login");
+          } else {
+            this.$router.push("/transfer");
+          }
+        }
+      );
+    },
   },
 };
 </script>

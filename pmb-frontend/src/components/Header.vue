@@ -1,10 +1,9 @@
 <template>
-  <div class="container-fluid">
     <nav class="navbar navbar-expand-lg navbar-light">
       <div class="container-fluid">
         <span class="navbar-brand"><MainTitle></MainTitle></span>
         <button
-          class="navbar-toggler"
+          class="navbar-toggler ms-auto"
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navbarHeader"
@@ -14,28 +13,31 @@
         >
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="col-auto me-5 d-flex">
+        <div class="d-flex">
           <div class="collapse navbar-collapse" id="navbarHeader">
             <div class="navbar-nav">
               <router-link
                 class="nav-link"
-                :to="{ name: 'Home', params: { email:this.$route.params.email } }"
+                to='/home'
                 >Home</router-link
               >
               <router-link
                 class="nav-link"
-                :to="{ name: 'Transfer', params: { email:this.$route.params.email } }"
+                to='/transfer'
                 >Transfer</router-link
               >
-              <router-link class="nav-link" to="/profile">Profile</router-link>
-              <router-link class="nav-link" to="/contact">Contact</router-link>
-              <router-link class="nav-link" to="/">Log off</router-link>
+              <router-link
+                class="nav-link"
+                to='/profile'
+                >Profile</router-link
+              >
+              <a class="nav-link" href="mailto:contact@email.com">Contact</a>
+              <a class="nav-link" href @click="logOut">Log off</a>
             </div>
           </div>
         </div>
       </div>
     </nav>
-  </div>
 </template>
 
 <script>
@@ -46,6 +48,12 @@ export default {
   components: {
     MainTitle,
   },
+  methods: {
+    logOut() {
+      this.$store.dispatch('auth/logout');
+      this.$router.push('/login');
+    }
+  }
 };
 </script>
 

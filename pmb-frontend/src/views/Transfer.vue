@@ -5,9 +5,7 @@
     <nav aria-label="breadcrumb" class="bg-light">
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
-          <router-link :to="{ name: 'Home', params: { email: this.userEmail } }"
-            >Home</router-link
-          >
+          <router-link to="/home">Home</router-link>
         </li>
         <li class="breadcrumb-item active" aria-current="page">Transfer</li>
       </ol>
@@ -18,12 +16,7 @@
         <div class="row align-items-center justify-content-between">
           <div class="col-auto text-center">Send Money</div>
           <div class="col-auto">
-            <router-link
-              :to="{
-                name: 'Connection',
-                params: { email: this.$route.params.email },
-              }"
-            >
+            <router-link to="/connection">
               <button type="button" class="btn btn-primary">
                 Add Connection
               </button>
@@ -31,7 +24,7 @@
           </div>
         </div>
 
-        <form class="needs-validation" @submit="onSubmit">
+        <form class="needs-validation" v-on:submit.prevent="onPay">
           <div
             class="card h-100 text-dark bg-light mb-3 justify-content-center"
           >
@@ -40,14 +33,14 @@
                 <div class="col-4">
                   <select
                     class="form-select form-select-md"
+                    id="connection-select"
                     aria-label="Select connection"
-                    v-model="form.connection"
                   >
-                    <option value="" selected>Connections</option>
+                    <option value="">Connections</option>
                     <option
                       v-for="connection in connections"
                       :key="connection.name"
-                      :value="connection"
+                      :value="connection.connectionEmail"
                     >
                       {{ connection.name }}
                     </option>
@@ -59,7 +52,7 @@
                     class="form-control"
                     value="0"
                     aria-label="Amount"
-                    v-model="form.amount"
+                    v-model="amount"
                   />
                 </div>
                 <div class="d-grid col-2">
@@ -92,7 +85,7 @@
               v-for="transaction in transactions"
               v-bind:key="transaction.date"
             >
-              <td>{{ transaction.connection.name }}</td>
+              <td>{{ transaction.connectionName }}</td>
               <td>{{ transaction.description }}</td>
               <td>{{ transaction.amount }}</td>
             </tr>
@@ -105,8 +98,8 @@
 
  <script>
 import Header from "../components/Header.vue";
-import ConnectionService from "../services/ConnectionService";
-import TransactionService from "../services/TransactionService";
+import ConnectionService from "../services/connection.service";
+import TransactionService from "../services/transaction.service";
 
 export default {
   name: "Transfer",
@@ -117,68 +110,63 @@ export default {
     return {
       connections: [],
       transactions: [],
-      form: {
-        connection: {
-          email: "",
-          name: "",
-        },
-        amount: 0,
-      },
+      amount: 0,
     };
   },
   methods: {
-    getConnections(email) {
-      ConnectionService.getConnections(email)
-        .then((response) => {
-          this.connections = response.data;
-        })
-        .catch((e) => {
-          if (e.response) {
-            alert(e.response.data);
-          } else {
-            alert(e);
-          }
-        });
-    },
-    getTransactions(email) {
-      TransactionService.getMyTransactions(email)
-        .then((response) => {
-          this.transactions = response.data;
-        })
-        .catch((e) => {
-          if (e.response) {
-            alert(e.response.data);
-          } else {
-            alert(e);
-          }
-        });
-    },
-    onSubmit() {
-      if (this.form.connection.email === "" || this.form.amount <= 0) {
+    onPay() {
+      var selection = document.querySelector("#connection-select");
+      var index = selection.selectedIndex;
+      var connection = {
+        name: selection[index].text,
+        connectionEmail: selection[index].value,
+      };
+      if (connection.connectionEmail === "" || this.amount <= 0) {
         alert("A connection and a positive amount are required");
       } else {
         this.$router.push({
           name: "Summary",
           params: {
-            email: this.userEmail,
-            connection: this.form.connection,
-            amount: this.form.amount,
+            connection: connection,
+            amount: this.amount,
           },
         });
       }
     },
   },
   mounted() {
-    if (this.$route.params.email !== undefined) {
-      this.getConnections(this.userEmail);
-      this.getTransactions(this.userEmail);
+    if (this.$store.state.auth.user !== null) {
+      ConnectionService.getConnections(this.userEmail).then(
+        (response) => {
+          this.connections = response.data;
+        },
+        (error) => {
+          alert(error.response.data.error || error.message || error.toString());
+          this.$store.dispatch("auth/logout");
+          this.$router.push("/login");
+        }
+      );
+      TransactionService.getMyTransactions(this.userEmail).then(
+        (response) => {
+          this.transactions = response.data;
+        },
+        (error) => {
+          alert(error.response.data.error || error.message || error.toString());
+          if (error.response.data.status === 401) {
+            this.$store.dispatch("auth/logout");
+            this.$router.push("/login");
+          } else {
+            this.$router.push("/home");
+          }
+        }
+      );
     } else {
-      this.$router.replace({ name: "Login" });
+      this.$router.push("/login");
     }
   },
   computed: {
-    userEmail() {
-      return this.$route.params.email;
+    userEmail: function () {
+      return this.$store.state.auth.user.email;
     },
   },
 };

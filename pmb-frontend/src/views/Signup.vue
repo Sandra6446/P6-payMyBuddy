@@ -8,10 +8,10 @@
 
         <form
           class="needs-validation py-5 mx-auto col-11 col-md-9"
-          @submit="onSubmit"
+          v-on:submit.prevent="handleRegister"
         >
           <div class="accordion" id="accordion">
-            <div class="accordion-item bg-light">
+            <div class="accordion-item bg-light" id="identity">
               <h2 class="accordion-header" id="headingLogin">
                 <button
                   class="accordion-button fw-bold"
@@ -33,32 +33,32 @@
                   <IdentityInput
                     id="firstName"
                     placeholder="Firstname"
-                    v-model="form.firstName"
+                    v-model="user.firstName"
                   ></IdentityInput>
 
                   <IdentityInput
                     id="lastName"
                     placeholder="Lastname"
-                    v-model="form.lastName"
+                    v-model="user.lastName"
                   ></IdentityInput>
-                  <EmailInput v-model="form.email"></EmailInput>
+                  <EmailInput v-model="user.email"></EmailInput>
 
                   <PasswordInput
                     id="password"
                     placeholder="Password"
-                    v-model="form.password"
+                    v-model="user.password"
                   ></PasswordInput>
 
                   <PasswordInput
                     id="confirmPassword"
                     placeholder="Confirm password"
-                    v-model="form.confirmPassword"
+                    v-model="user.confirmPassword"
                   ></PasswordInput>
                 </div>
               </div>
             </div>
 
-            <div class="accordion-item bg-light">
+            <div class="accordion-item bg-light" id="bankAccount">
               <h2 class="accordion-header" id="headingBank">
                 <button
                   class="accordion-button fw-bold"
@@ -73,7 +73,7 @@
               </h2>
               <div
                 id="collapseBank"
-                class="accordion-collapse collapse"
+                class="accordion-collapse collapse show"
                 aria-labelledby="headingBank"
               >
                 <div class="accordion-body col-11 col-md-9 mx-auto">
@@ -81,19 +81,19 @@
                     class="my-3"
                     id="bank"
                     placeholder="Bank"
-                    v-model="form.bankAccount.bank"
+                    v-model="user.bankAccount.bank"
                   ></RibInput>
                   <RibInput
                     class="my-3"
                     id="iban"
                     placeholder="IBAN"
-                    v-model="form.bankAccount.iban"
+                    v-model="user.bankAccount.iban"
                   ></RibInput>
                   <RibInput
                     class="my-3"
                     id="bic"
                     placeholder="BIC"
-                    v-model="form.bankAccount.bic"
+                    v-model="user.bankAccount.bic"
                   ></RibInput>
                 </div>
               </div>
@@ -116,7 +116,6 @@ import IdentityInput from "../components/IdentityInput.vue";
 import EmailInput from "../components/EmailInput.vue";
 import PasswordInput from "../components/PasswordInput.vue";
 import RibInput from "../components/RibInput.vue";
-import UserService from "../services/UserService.js";
 
 export default {
   name: "Signup",
@@ -130,7 +129,7 @@ export default {
   },
   data() {
     return {
-      form: {
+      user: {
         firstName: "",
         lastName: "",
         email: "",
@@ -141,28 +140,30 @@ export default {
     };
   },
   methods: {
-    onSubmit() {
-      var data = {
-        firstName: this.form.firstName,
-        lastName: this.form.lastName,
-        email: this.form.email,
-        password: this.form.password,
-        confirmPassword: this.form.confirmPassword,
-        bankAccount: { bank: this.form.bankAccount.bank, iban: this.form.bankAccount.iban, bic: this.form.bankAccount.bic },
-      };
-      alert(data.firstName);
-      UserService.add(data)
-        .then((response) => {
-          if (response.status === 201) {
-            this.$router.replace("/home");
-          } else {
-            alert(response.data);
+    handleRegister() {
+      var currentUser =  {
+        email: this.user.email,
+        password: this.user.password
+      }
+      this.$store.dispatch("auth/register", this.user).then(
+        () => {
+           this.$store.dispatch("auth/login", currentUser).then(
+          () => {
+            this.$router.push("/home");
+          },
+          (error) => {
+            alert(
+              error.response.data.error || error.message || error.toString()
+            );
           }
-        })
-        .catch((e) => {
-          alert(e);
-        });
-      
+        );
+        },
+        (error) => {
+          alert(
+              error.response.data || error.message || error.toString()
+            );
+        }
+      );
     },
   },
 };

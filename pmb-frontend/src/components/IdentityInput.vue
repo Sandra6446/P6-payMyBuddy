@@ -1,5 +1,5 @@
 <template>
-  <div class="input-group input-group-lg mb-3">
+  <div class="input-group input-group-lg my-3">
     <span class="input-group-text bg-white">
       <img
         src="../assets/person-fill.svg"

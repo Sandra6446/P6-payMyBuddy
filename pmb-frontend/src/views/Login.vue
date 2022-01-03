@@ -8,14 +8,14 @@
 
         <form
           class="needs-validation my-5 col-11 col-md-9 mx-auto"
-          @submit="onSubmit"
+          v-on:submit.prevent="handleLogin"
         >
-          <EmailInput class="my-4" v-model="form.email"></EmailInput>
+          <EmailInput class="my-4" v-model="user.email"></EmailInput>
+
           <PasswordInput
-            v-model="form.password"
+            v-model="user.password"
             id="password"
             placeholder="Password"
-            v-bind:passwordRequired="true"
           ></PasswordInput>
 
           <div class="row justify-content-center">
@@ -23,8 +23,9 @@
               <input
                 class="form-check-input fs-5"
                 type="checkbox"
-                value=""
                 id="check-remember"
+                value="isChecked"
+                aria-checked="false"
               />
               <label class="form-check-label fs-5" for="check-remember">
                 Remember me
@@ -50,7 +51,6 @@ import MainTitle from "../components/MainTitle.vue";
 import SubmitButton from "../components/SubmitButton.vue";
 import EmailInput from "../components/EmailInput.vue";
 import PasswordInput from "../components/PasswordInput.vue";
-import LoginService from "../services/LoginService";
 
 export default {
   name: "Login",
@@ -62,31 +62,46 @@ export default {
   },
   data() {
     return {
-      form: {
+      user: {
         email: "",
         password: "",
       },
     };
   },
+  computed: {
+    loggedIn() {
+      return this.$store.state.auth.status.loggedIn;
+    },
+  },
+  created() {
+    if (this.loggedIn) {
+      this.$router.push("/home");
+    } else {
+      this.user.email = this.$cookies.get('email');
+      this.user.password = this.$cookies.get('pwd');
+    }
+  },
   methods: {
-    onSubmit() {
-      var data = {
-        email: this.form.email,
-        password: this.form.password,
-      };
-      LoginService.submit(data)
-        .then((response) => {
-          if (response.status === 200) {
-            this.$router.push({ name: 'Home', params: { email: data.email } });
+    handleLogin() {
+      if (this.user.email && this.user.password) {
+        this.$store.dispatch("auth/login", this.user).then(
+          () => {
+            if (document.querySelector('#check-remember').checked) {
+              this.$cookies.set('email',this.user.email);
+              this.$cookies.set('pwd',this.user.password);
+            } else {
+              this.$cookies.remove('email');
+              this.$cookies.remove('pwd');
+            }
+            this.$router.push("/home");
+          },
+          (error) => {
+            alert(
+              error.response.data.error || error.message || error.toString()
+            );
           }
-        })
-        .catch((e) => {
-          if (e.response) {
-            alert(e.response.data);
-          } else {
-            alert(e);
-          }
-        });
+        );
+      }
     },
   },
 };

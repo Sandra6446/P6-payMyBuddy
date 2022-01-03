@@ -9,8 +9,8 @@
     </span>
     <input
       class="form-control border-start-0"
-      @input="emitCustomEvent"
       v-bind:value="value"
+      v-on:input="$emit('input', $event.target.value)"
       type="email"
       id="email"
       placeholder="Email"
@@ -26,11 +26,6 @@ export default {
   props: {
     value: {
       type: String,
-    },
-  },
-  methods: {
-    emitCustomEvent() {
-      this.$emit("input", event.target.value);
     },
   },
 };

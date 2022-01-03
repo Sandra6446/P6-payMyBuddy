@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import VueRouter from 'vue-router'
+import Router from 'vue-router'
 
 import Login from '../views/Login.vue'
 import SignUp from '../views/Signup.vue'
@@ -9,56 +9,46 @@ import Connection from '../views/Connection.vue'
 import Summary from '../views/Summary.vue'
 import Profile from '../views/Profile.vue'
 
-Vue.use(VueRouter)
+Vue.use(Router)
 
-const routes = [
-  {
-    path: '/',
-    name: 'Login',
-    component: Login
-  },
-  {
-    path: '/signup',
-    name: 'Signup',
-    component: SignUp
-  },
-  {
-    path: '/contact',
-    name: 'Contact',
-    component: () => import('../views/Contact.vue')
-  },
-  {
-    path: '/home',
-    name: 'Home',
-    component: Home,
-    alias: '/home/:email'
-  },
-  {
-    path: '/transfer',
-    name: 'Transfer',
-    component: Transfer,
-    alias: '/transfer/:email'
-  },
-  {
-    path: '/connection',
-    name: 'Connection',
-    component: Connection,
-    alias: '/connection/:email'
-  },
-  {
-    path: '/summary',
-    name: 'Summary',
-    component: Summary
-  },
-  {
-    path: '/profile',
-    name: 'Profile',
-    component: Profile
-  }
-]
-
-const router = new VueRouter({
-  routes
-})
-
-export default router
+export const router = new Router({
+  mode: 'history',
+  routes: [
+    {
+      path: '/',
+      component: Login
+    },
+    {
+      path: '/login',
+      component: Login
+    },
+    {
+      path: '/signup',
+      component: SignUp
+    },
+    {
+      path: '/home',
+      component: Home,
+    },
+    {
+      path: '/transfer',
+      name: 'Transfer',
+      component: Transfer,
+    },
+    {
+      path: '/connection',
+      name: 'Connection',
+      component: Connection,
+    },
+    {
+      path: '/summary',
+      name: 'Summary',
+      component: Summary
+    },
+    {
+      path: '/profile',
+      name: 'Profile',
+      component: Profile
+    }
+  ]
+});

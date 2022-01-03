@@ -10,7 +10,10 @@
 
     <div class="col col-10 mx-auto">
       <div class="row justify-content-md-center my-5">
-        <h1>Welcome {{ fullName }}</h1>
+        <h1>
+          Welcome {{ this.currentUser.firstName }}
+          {{ this.currentUser.lastName }}
+        </h1>
       </div>
       <div class="card text-center my-5">
         <div class="card-header">Available balance</div>
@@ -36,9 +39,12 @@
         </thead>
         <tbody>
           <tr v-for="transaction in transactions" v-bind:key="transaction.date">
-            <td>{{ transaction.connection.name }}</td>
+            <td>{{ transaction.connectionName }}</td>
             <td>{{ transaction.description }}</td>
-            <td>{{ transaction.amount }}</td>
+            <td v-if="transaction.type === 'CREDIT'">
+              + {{ transaction.amount }}
+            </td>
+            <td v-else>- {{ transaction.amount }}</td>
           </tr>
         </tbody>
       </table>
@@ -48,8 +54,8 @@
 
  <script>
 import Header from "../components/Header.vue";
-import UserService from "../services/UserService";
-import TransactionService from "../services/TransactionService";
+import UserService from "../services/user.service";
+import TransactionService from "../services/transaction.service";
 
 export default {
   name: "Home",
@@ -61,52 +67,40 @@ export default {
       currentUser: {
         firstName: "",
         lastName: "",
+        balance: 0,
       },
       transactions: [],
     };
   },
-  methods: {
-    getUser(email) {
-      UserService.getUser(email)
-        .then((response) => {
-          this.currentUser = response.data;
-        })
-        .catch((e) => {
-          if (e.response) {
-            alert(e.response.data);
-          } else {
-            alert(e);
-          }
-        });
-    },
-    getTransactions(email) {
-      TransactionService.getTransactions(email)
-        .then((response) => {
-          this.transactions = response.data;
-        })
-        .catch((e) => {
-          if (e.response) {
-            alert(e.response.data);
-          } else {
-            alert(e);
-          }
-        });
+  computed: {
+    userEmail: function() {
+      return this.$store.state.auth.user.email;
     },
   },
   mounted() {
-    if (this.$route.params.email !== undefined) {
-      this.getUser(this.userEmail);
-      this.getTransactions(this.userEmail);
+    if (this.$store.state.auth.user !== null) {
+      UserService.getUser(this.userEmail).then(
+        (response) => {
+          this.currentUser = response.data;
+        },
+        (error) => {
+          alert(error.response.data || error.message || error.toString());
+          this.$store.dispatch("auth/logout");
+          this.$router.push("/login");
+        }
+      );
+      TransactionService.getTransactions(this.userEmail).then(
+        (response) => {
+          this.transactions = response.data;
+        },
+        (error) => {
+          alert(error.response.data || error.message || error.toString());
+          this.$store.dispatch("auth/logout");
+          this.$router.push("/login");
+        }
+      );
     } else {
-      this.$router.replace({ name: "Login" });
-    }
-  },
-  computed: {
-    fullName: function () {
-      return this.currentUser.firstName + " " + this.currentUser.lastName;
-    },
-    userEmail() {
-      return this.$route.params.email
+      this.$router.push("/login");
     }
   },
 };

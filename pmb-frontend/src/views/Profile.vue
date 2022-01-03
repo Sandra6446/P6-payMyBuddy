@@ -13,7 +13,7 @@
 
     <form
       class="needs-validation py-5 col-11 col-md-9 mx-auto"
-      @submit="onSubmit"
+      v-on:submit.prevent="onSave"
     >
       <div class="accordion" id="accordion">
         <div class="accordion-item bg-light">
@@ -38,26 +38,27 @@
               <IdentityInput
                 id="firstName"
                 placeholder="Firstname"
-                v-model="form.firstName"
+                v-model="currentUser.firstName"
               ></IdentityInput>
 
               <IdentityInput
                 id="lastName"
                 placeholder="Lastname"
-                v-model="form.lastName"
+                v-model="currentUser.lastName"
               ></IdentityInput>
-              <EmailInput v-model="form.email"></EmailInput>
+
+              <EmailInput v-model="currentUser.email"></EmailInput>
 
               <PasswordInput
                 id="password"
                 placeholder="Password"
-                v-model="form.password"
+                v-model="currentUser.password"
               ></PasswordInput>
 
               <PasswordInput
                 id="confirmPassword"
                 placeholder="Confirm password"
-                v-model="form.confirmPassword"
+                v-model="currentUser.confirmPassword"
               ></PasswordInput>
             </div>
           </div>
@@ -86,19 +87,19 @@
                 class="my-3"
                 id="bank"
                 placeholder="Bank"
-                v-model="form.bankAccount.bank"
+                v-model="currentUser.bankAccount.bank"
               ></RibInput>
               <RibInput
                 class="my-3"
                 id="iban"
                 placeholder="IBAN"
-                v-model="form.bankAccount.iban"
+                v-model="currentUser.bankAccount.iban"
               ></RibInput>
               <RibInput
                 class="my-3"
                 id="bic"
                 placeholder="BIC"
-                v-model="form.bankAccount.bic"
+                v-model="currentUser.bankAccount.bic"
               ></RibInput>
             </div>
           </div>
@@ -119,7 +120,7 @@ import IdentityInput from "../components/IdentityInput.vue";
 import EmailInput from "../components/EmailInput.vue";
 import PasswordInput from "../components/PasswordInput.vue";
 import RibInput from "../components/RibInput.vue";
-/*import UserService from "../services/UserService.js";*/
+import UserService from "../services/user.service.js";
 
 export default {
   name: "Profile",
@@ -133,39 +134,86 @@ export default {
   },
   data() {
     return {
-      form: {
-        firstName: "Laure",
-        lastName: "BRUN",
-        email: "laure.brun@email.com",
+      currentUser: {
+        firstName: "",
+        lastName: "",
+        email: "",
         password: "",
         confirmPassword: "",
-        bankAccount: { bank: "maBanque", iban: "XXXX", bic: "XXX" },
+        bankAccount: {
+          bank: "",
+          iban: "",
+          bic: "",
+        },
       },
     };
   },
   methods: {
-    onSubmit() {
-      /*
-      var data = {
-        firstName: this.firstName,
-        lastName: this.lastName,
-        email: this.email,
-        password: this.password,
-        confirmPassword: this.confirmPassword,
-        bankAccount: { bank: this.bank, iban: this.iban, bic: this.bic },
-      };
-      alert(JSON.stringify(this.form));
-      UserService.submit(data)
-        .then((response) => {
-          alert(response);
-        })
-        .catch((e) => {
-          alert(e);
-          
-        });
-        */
-      this.$router.push("/home");
+    onSave() {
+      if (this.currentUser.password === this.currentUser.confirmPassword) {
+        UserService.update(this.userEmail, this.currentUser).then(
+          () => {
+            this.$store.dispatch("auth/logout");
+            var user = {
+              email: this.currentUser.email,
+              password: this.currentUser.password,
+            };
+            this.$store.dispatch("auth/login", user).then(
+              () => {
+                this.$router.push("/home");
+              },
+              (error) => {
+                alert(
+                  error.response.data.error || error.message || error.toString()
+                );
+              }
+            );
+          },
+          (error) => {
+            alert(error.response.data || error.message || error.toString());
+          }
+        );
+      } else {
+        alert("The two passwords have to be equals");
+      }
     },
+  },
+  computed: {
+    userEmail: function () {
+      return this.$store.state.auth.user.email;
+    },
+  },
+  mounted() {
+    if (this.$store.state.auth.user !== null) {
+      UserService.getUser(this.userEmail).then(
+        (response) => {
+          var profile = {
+            firstName: response.data.firstName,
+            lastName: response.data.lastName,
+            email: response.data.email,
+            password: "",
+            confirmPassword: "",
+            bankAccount: {
+              bank: response.data.bankAccount.bank,
+              iban: response.data.bankAccount.iban,
+              bic: response.data.bankAccount.bic,
+            },
+          };
+          this.currentUser = profile;
+        },
+        (error) => {
+          alert(error.response.data.error || error.message || error.toString());
+          if (error.response.data.status === 401) {
+            this.$store.dispatch("auth/logout");
+            this.$router.push("/login");
+          } else {
+            this.$router.push("/home");
+          }
+        }
+      );
+    } else {
+      this.$router.push("/login");
+    }
   },
 };
 </script>
