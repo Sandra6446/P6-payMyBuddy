@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 /**
- * Exception that can be thrown when the requested object is already in data file.
+ * Exception that can be thrown when the requested object is already in database
  */
 @Getter
 public class AlreadyInDatabaseException extends APIRuntimeException {

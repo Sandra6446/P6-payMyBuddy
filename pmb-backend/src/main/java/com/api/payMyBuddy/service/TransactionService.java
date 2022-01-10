@@ -9,6 +9,7 @@ import com.api.payMyBuddy.model.front.Transaction;
 import com.api.payMyBuddy.model.repository.TransactionEntityRepository;
 import com.api.payMyBuddy.model.repository.UserEntityRepository;
 import com.api.payMyBuddy.service.mapper.MapperTransaction;
+import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Manages user transactions
+ */
 @Service
+@AllArgsConstructor
 public class TransactionService {
     private static final Logger logger = LogManager.getLogger(UserController.class);
 
@@ -34,11 +39,14 @@ public class TransactionService {
     @Autowired
     private MapperTransaction mapperTransaction;
 
-    @Autowired
-    private UserService userService;
-
+    /**
+     * Gets transactions made by a user
+     *
+     * @param email : The current user email
+     * @return Status OK, with the transaction list if the operation succeeds, otherwise the reason of the failure
+     */
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public ResponseEntity<Object> getMyTransactions(String email) {
+    public ResponseEntity<Object> getMyTransactions(String email) throws RuntimeException {
         Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(email);
         if (userEntityOptional.isEmpty()) {
             logger.error(String.format("User %s not found", email));
@@ -50,8 +58,14 @@ public class TransactionService {
         }
     }
 
+    /**
+     * Gets all the transactions of a user
+     *
+     * @param email : The current user email
+     * @return Status OK, with the transaction list if the operation succeeds, otherwise the reason of the failure
+     */
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public ResponseEntity<Object> getAllTransactions(String email) {
+    public ResponseEntity<Object> getAllTransactions(String email) throws RuntimeException {
         Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(email);
         if (userEntityOptional.isEmpty()) {
             logger.error(String.format("User %s not found", email));
@@ -63,8 +77,14 @@ public class TransactionService {
         }
     }
 
+    /**
+     * Adds a transaction
+     *
+     * @param transaction : the transaction to be added
+     * @return Status CREATED, "Transaction added" if the operation succeeds, otherwise the reason of the failure
+     */
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public ResponseEntity<String> createTransaction(Transaction transaction) {
+    public ResponseEntity<String> createTransaction(Transaction transaction) throws RuntimeException {
         Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(transaction.getUserEmail());
         if (userEntityOptional.isEmpty()) {
             logger.error(String.format("User %s not found", transaction.getUserEmail()));
@@ -80,15 +100,16 @@ public class TransactionService {
                 TransactionEntity transactionEntity = new TransactionEntity(userEntity, userEntityConnection, transaction);
                 transactionEntityRepository.saveAndFlush(transactionEntity);
                 userEntity.updateBalance(-transactionEntity.getAmount());
-                if (userEntity.getBalance()>=0) {
+                if (userEntity.getBalance() >= 0) {
                     userEntityRepository.saveAndFlush(userEntity);
-                    logger.info(String.format("User %s : Transaction %s registered",transaction.getUserEmail(),transaction));
-                    return new ResponseEntity<>("Transaction added", HttpStatus.CREATED);
                 } else {
-                    logger.error(String.format("Balance negative : ", userEntity.getBalance()));
+                    logger.error(String.format("Balance negative : %s ", userEntity.getBalance()));
                     throw new NotEnoughMoneyException("Please recharge money");
                 }
-
+                userEntityConnection.updateBalance(transactionEntity.getAmount());
+                userEntityRepository.saveAndFlush(userEntityConnection);
+                logger.info(String.format("User %s : Transaction %s registered", transaction.getUserEmail(), transaction));
+                return new ResponseEntity<>("Transaction added", HttpStatus.CREATED);
             }
         }
     }

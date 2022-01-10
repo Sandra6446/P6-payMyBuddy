@@ -2,6 +2,9 @@ package com.api.payMyBuddy.exceptions;
 
 import org.springframework.http.HttpStatus;
 
+/**
+ * Exception that can be thrown when the database request failed
+ */
 public class APIRuntimeException extends RuntimeException {
 
     protected HttpStatus httpStatus;

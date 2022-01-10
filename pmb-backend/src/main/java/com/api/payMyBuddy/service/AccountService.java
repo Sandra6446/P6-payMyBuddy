@@ -15,17 +15,31 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+/**
+ * Manages user balance
+ */
 @Service
 public class AccountService {
 
     private static final Logger logger = LogManager.getLogger(UserController.class);
 
     @Autowired
-    private UserEntityRepository userEntityRepository;
+    private final UserEntityRepository userEntityRepository;
 
+    public AccountService(UserEntityRepository userEntityRepository) {
+        this.userEntityRepository = userEntityRepository;
+    }
+
+    /**
+     * Adds money to a user account
+     *
+     * @param email  : the receiver email
+     * @param amount : the amount to be added
+     * @return Status OK,"Account updated" if the operation succeeds, otherwise the reason of the failure
+     */
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public ResponseEntity<Object> addMoney(String email, int amount) throws RuntimeException {
-        if (amount<0) {
+        if (amount <= 0) {
             logger.error("Please enter a positive amount");
             return new ResponseEntity<>("Please enter a positive amount", HttpStatus.BAD_REQUEST);
         } else {

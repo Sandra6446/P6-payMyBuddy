@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+/**
+ * Generates token
+ */
 @Component
 public class JwtUtils {
     private static final Logger logger = LogManager.getLogger(JwtUtils.class);
@@ -22,10 +25,10 @@ public class JwtUtils {
 
     public String generateJwtToken(Authentication authentication) {
 
-        Login login = (Login) authentication.getPrincipal();
+        Login userDetails = (Login) authentication.getPrincipal();
 
         return Jwts.builder()
-                .setSubject((login.getUsername()))
+                .setSubject((userDetails.getEmail()))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)

@@ -21,6 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Manages the current user connections
+ */
 @Service
 @AllArgsConstructor
 public class ConnectionService {
@@ -34,10 +37,16 @@ public class ConnectionService {
     private ConnectionEntityRepository connectionEntityRepository;
 
     @Autowired
-    MapperConnection mapperConnection;
+    private MapperConnection mapperConnection;
 
+    /**
+     * Adds a contact
+     *
+     * @param connection : The contact to create
+     * @return Status CREATED,"Connection added" if the operation succeeds, otherwise the reason of the failure
+     */
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public ResponseEntity<String> createConnection(Connection connection) {
+    public ResponseEntity<String> createConnection(Connection connection) throws RuntimeException {
         Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(connection.getUserEmail());
         if (userEntityOptional.isEmpty()) {
             logger.error(String.format("User %s not found", connection.getUserEmail()));
@@ -56,15 +65,20 @@ public class ConnectionService {
                     throw new AlreadyInDatabaseException("Connection already registered");
                 } else {
                     connectionEntityRepository.saveAndFlush(connectionEntity);
-                    logger.info(String.format("User %s : Connection %s added", connection.getUserEmail(),connection));
+                    logger.info(String.format("User %s : Connection %s added", connection.getUserEmail(), connection));
                     return new ResponseEntity<>("Connection added", HttpStatus.CREATED);
                 }
             }
         }
     }
 
+    /**
+     * Gets the connection list of current user
+     * @param userEmail : The current user email
+     * @return Status OK, with the connection list if the operation succeeds, otherwise the reason of the failure
+     */
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public ResponseEntity<Object> getConnections(String userEmail) {
+    public ResponseEntity<Object> getConnections(String userEmail) throws RuntimeException {
         Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(userEmail);
         if (userEntityOptional.isEmpty()) {
             logger.error(String.format("User %s not found", userEmail));

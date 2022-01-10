@@ -6,8 +6,13 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+/**
+ * Represents a connection entity in database
+ *
+ * @see com.api.payMyBuddy.model.front.Connection
+ */
 @Entity
-@Table(name="reseau")
+@Table(name = "reseau")
 @Getter
 @Setter
 @EqualsAndHashCode
@@ -15,13 +20,18 @@ import javax.persistence.Table;
 @AllArgsConstructor
 public class ConnectionEntity {
 
+    /**
+     * The composed primary key of table "reseau"
+     *
+     * @see ConnectionPrimaryKey
+     */
     @EmbeddedId
     private ConnectionPrimaryKey connectionPrimaryKey;
 
-    public ConnectionEntity(UserEntity userEntity, UserEntity userEntityConnection) {
+    public ConnectionEntity(UserEntity userEntity, UserEntity contactEntity) {
         ConnectionPrimaryKey primaryKey = new ConnectionPrimaryKey();
         primaryKey.setUserEntity(userEntity);
-        primaryKey.setUserEntityConnection(userEntityConnection);
+        primaryKey.setContactEntity(contactEntity);
         this.setConnectionPrimaryKey(primaryKey);
     }
 

@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+/**
+ * Controls the authentication and registration of a user in Pay My Buddy
+ */
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
@@ -25,29 +28,41 @@ import javax.validation.Valid;
 public class AuthController extends ValidationClass {
 
     @Autowired
-    UserService userService;
+    private final UserService userService;
 
     @Autowired
-    AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
     @Autowired
-    JwtUtils jwtUtils;
+    private final JwtUtils jwtUtils;
 
+    /**
+     * Authenticates a user
+     *
+     * @param login : The email and password of the user to be authenticated
+     * @return Status OK, a token and the user's email if the operation succeeds, otherwise the reason for the failure
+     */
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody Login login) {
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword()));
+                new UsernamePasswordAuthenticationToken(login.getEmail(), login.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
 
-        Login actual = (Login) authentication.getPrincipal();
+        Login userDetails = (Login) authentication.getPrincipal();
 
         return ResponseEntity.ok(new JwtResponse(jwt,
-                actual.getEmail()));
+                userDetails.getEmail()));
     }
 
+    /**
+     * Registers a user
+     *
+     * @param user : The user to be registered
+     * @return Status CREATED,"User created" if the operation succeeds, otherwise the reason for the failure
+     */
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
         if (isNotValid(user)) {

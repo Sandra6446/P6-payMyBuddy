@@ -1,29 +1,42 @@
 package com.api.payMyBuddy.model.front;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
 
 import javax.validation.constraints.NotNull;
+import java.util.StringJoiner;
 
-@Getter
-@Setter
+/**
+ * Represents the bank account of a user
+ */
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class BankAccount {
 
+    /**
+     * The bank name
+     */
     @NotNull
     private String bank;
 
+    /**
+     * The IBAN
+     */
     @NotNull
     private String iban;
 
+    /**
+     * The BIC
+     */
     @NotNull
     private String bic;
 
-    @SneakyThrows
     @Override
     public String toString() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsString(this);
+        return new StringJoiner(", ", "" + "{", "}")
+                .add("\"bank\":\"" + bank + "\"")
+                .add("\"iban\":\"" + iban + "\"")
+                .add("\"bic\":\"" + bic + "\"")
+                .toString();
     }
 }

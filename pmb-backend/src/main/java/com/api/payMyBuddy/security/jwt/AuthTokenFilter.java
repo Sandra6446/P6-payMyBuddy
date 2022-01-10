@@ -1,12 +1,12 @@
 package com.api.payMyBuddy.security.jwt;
 
-import com.api.payMyBuddy.model.front.Login;
-import com.api.payMyBuddy.service.UserService;
+import com.api.payMyBuddy.security.services.UserDetailsServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -17,15 +17,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Filters user authorisations
+ */
 public class AuthTokenFilter extends OncePerRequestFilter {
 
+    private static final Logger logger = LogManager.getLogger(AuthTokenFilter.class);
     @Autowired
     private JwtUtils jwtUtils;
-
     @Autowired
-    private UserService userService;
-
-    private static final Logger logger = LogManager.getLogger(AuthTokenFilter.class);
+    private UserDetailsServiceImpl userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -35,19 +36,19 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
                 String email = jwtUtils.getUserNameFromJwtToken(jwt);
 
-                Login login = userService.loadUserByUsername(email);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(email,
                                 null,
-                                login.getAuthorities());
+                                userDetails.getAuthorities());
 
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception e) {
-            logger.error("Cannot set user authentication: {}", e);
+            logger.error(String.format("Cannot set user authentication: %s", e));
         }
 
         filterChain.doFilter(request, response);

@@ -2,39 +2,54 @@ package com.api.payMyBuddy.model.front;
 
 import com.api.payMyBuddy.model.entity.ConnectionEntity;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.StringJoiner;
 
-@Getter
-@Setter
+/**
+ * Represents a user and his contact
+ *
+ * @see ConnectionEntity
+ */
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Connection {
 
+    /**
+     * The current user email
+     */
     @NotNull
     @NotEmpty
     private String userEmail;
 
+    /**
+     * The contact email
+     */
     @NotNull
     @NotEmpty
     private String connectionEmail;
 
+    /**
+     * The contact name
+     */
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String name;
 
     public Connection(ConnectionEntity connectionEntity) {
         this.setUserEmail(connectionEntity.getConnectionPrimaryKey().getUserEntity().getEmail());
-        this.setConnectionEmail(connectionEntity.getConnectionPrimaryKey().getUserEntityConnection().getEmail());
-        this.setName(String.format("%s %s", connectionEntity.getConnectionPrimaryKey().getUserEntityConnection().getFirstName(), connectionEntity.getConnectionPrimaryKey().getUserEntityConnection().getLastName()));
+        this.setConnectionEmail(connectionEntity.getConnectionPrimaryKey().getContactEntity().getEmail());
+        this.setName(String.format("%s %s", connectionEntity.getConnectionPrimaryKey().getContactEntity().getFirstName(), connectionEntity.getConnectionPrimaryKey().getContactEntity().getLastName()));
     }
 
-    @SneakyThrows
     @Override
     public String toString() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsString(this);
+        return new StringJoiner(", ", "" + "{", "}")
+                .add("\"userEmail\":\"" + userEmail + "\"")
+                .add("\"connectionEmail\":\"" + connectionEmail + "\"")
+                .add("\"name\":\"" + name + "\"")
+                .toString();
     }
 }

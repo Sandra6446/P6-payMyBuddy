@@ -9,12 +9,21 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.util.Set;
 
+/**
+ * Controls the validation of request parameters and body
+ */
 public abstract class ValidationClass {
 
     private static final Logger logger = LogManager.getLogger(ValidationClass.class);
     private static final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     private static final Validator validator = factory.getValidator();
 
+    /**
+     * Controls the validity of a json object
+     *
+     * @param object : The json object to be validated
+     * @return A boolean : "True" if the object is valid, otherwise "False"
+     */
     protected boolean isNotValid(Object object) {
         Set<ConstraintViolation<Object>> constraintViolations =
                 validator.validate(object);
@@ -29,6 +38,12 @@ public abstract class ValidationClass {
         }
     }
 
+    /**
+     * Controls if a string is empty
+     *
+     * @param string : The string to be validated
+     * @return A boolean : "True" if the object is valid, otherwise "False"
+     */
     protected boolean isEmpty(String string) {
         if (string.strip().isEmpty()) {
             logger.error("Error in request body");

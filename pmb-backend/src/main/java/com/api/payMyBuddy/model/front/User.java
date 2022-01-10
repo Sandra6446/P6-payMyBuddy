@@ -2,32 +2,47 @@ package com.api.payMyBuddy.model.front;
 
 import com.api.payMyBuddy.model.entity.UserEntity;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.SneakyThrows;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.StringJoiner;
 
-@Getter
-@Setter
+/**
+ * Represents a user
+ *
+ * @see Login
+ * @see UserEntity
+ */
+@Data
 @NoArgsConstructor
 public class User extends Login {
 
+    /**
+     * The user first name
+     */
     @NotNull
     @NotEmpty
     private String firstName;
 
+    /**
+     * The user last name
+     */
     @NotNull
     @NotEmpty
     private String lastName;
 
+    /**
+     * The user balance in the application
+     */
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private double balance;
 
+    /**
+     * The user bank account
+     */
     @NotNull
     @Valid
     private BankAccount bankAccount;
@@ -35,7 +50,6 @@ public class User extends Login {
     public User(UserEntity userEntity) {
         this.setEmail(userEntity.getEmail());
         this.setPassword(userEntity.getPassword());
-        this.setConfirmPassword("");
         this.setFirstName(userEntity.getFirstName());
         this.setLastName(userEntity.getLastName());
         this.setBalance(userEntity.getBalance());
@@ -50,10 +64,16 @@ public class User extends Login {
         this.bankAccount = bankAccount;
     }
 
-    @SneakyThrows
     @Override
     public String toString() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsString(this);
+        return new StringJoiner(", ", "" + "{", "}")
+                .add("\"email\":\"" + email + "\"")
+                .add("\"password\":\"" + password + "\"")
+                .add("\"confirmPassword\":\"" + confirmPassword + "\"")
+                .add("\"firstName\":\"" + firstName + "\"")
+                .add("\"lastName\":\"" + lastName + "\"")
+                .add("\"balance\":" + balance)
+                .add("\"bankAccount\":" + bankAccount)
+                .toString();
     }
 }

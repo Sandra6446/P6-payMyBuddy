@@ -1,8 +1,22 @@
 package com.api.payMyBuddy.model;
 
+/**
+ * Represents the authentication request response with token and user details
+ */
 public class JwtResponse {
+    /**
+     * The generated token
+     */
     private String token;
+
+    /**
+     * The type of authentication
+     */
     private String type = "Bearer";
+
+    /**
+     * The authenticated user email
+     */
     private String email;
 
     public JwtResponse(String accessToken, String email) {
