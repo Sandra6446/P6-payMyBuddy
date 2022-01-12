@@ -48,3 +48,5 @@ Ce repo contient :
 - > npm run serve
 
 Vous pouvez cliquer sur une des deux URL proposées et commencer les essais...
+
+Swagger est également disponible à l'adresse http://localhost:8080/swagger-ui/
