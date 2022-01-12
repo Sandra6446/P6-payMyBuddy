@@ -26,9 +26,9 @@ class MapperTransactionTest {
     private static void setUp() {
         userEntity = new UserEntity(1, "user@email.com", "User", "Test", "pwd", 20, "Bank", "Iban", "Bic", new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
         UserEntity userEntityConnection = new UserEntity(2, "connection@email.com", "Contact", "Test", "pwd", 50, "Bank", "Iban", "Bic", new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
-        TransactionEntity debit1 = new TransactionEntity(new TransactionPrimaryKey(userEntity, userEntityConnection, LocalDateTime.now()), 10, "My first debit", null, null);
-        TransactionEntity debit2 = new TransactionEntity(new TransactionPrimaryKey(userEntity, userEntityConnection, LocalDateTime.now()), 10, "My second debit", null, null);
-        TransactionEntity credit = new TransactionEntity(new TransactionPrimaryKey(userEntityConnection, userEntity, LocalDateTime.now()), 10, "My first credit", null, null);
+        TransactionEntity debit1 = new TransactionEntity(new TransactionPrimaryKey(userEntity, userEntityConnection, LocalDateTime.of(2021,12,10,20,30)), 10, "My first debit", null, null);
+        TransactionEntity debit2 = new TransactionEntity(new TransactionPrimaryKey(userEntity, userEntityConnection, LocalDateTime.of(2021,12,14,12,00)), 10, "My second debit", null, null);
+        TransactionEntity credit = new TransactionEntity(new TransactionPrimaryKey(userEntityConnection, userEntity, LocalDateTime.of(2021,12,14,15,00)), 10, "My first credit", null, null);
         List<TransactionEntity> debits = new ArrayList<>(List.of(debit1, debit2));
         userEntity.setDebits(debits);
         List<TransactionEntity> credits = new ArrayList<>(List.of(credit));
