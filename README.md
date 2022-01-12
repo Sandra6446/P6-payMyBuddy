@@ -49,4 +49,4 @@ Ce repo contient :
 
 Vous pouvez cliquer sur une des deux URL proposées et commencer les essais...
 
-Swagger est également disponible à l'adresse http://localhost:8080/swagger-ui/
+Swagger est également disponible à l'adresse http://localhost:8080/swagger-ui/ lorsque le backend est lancé.
