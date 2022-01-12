@@ -15,7 +15,7 @@ Ce repo contient :
 - Installer MySQL Server
 - Se connecter sur le compte admin
 - Lancer le script ScriptCreationDatabase.sql à l'aide de la commande :
-    > source "chemin du script"
+    > > source "chemin du script"
     
     Le script déclenche :
     * Suppression de la base pay_my_buddy si elle a déjà été créée
@@ -34,16 +34,16 @@ Ce repo contient :
 
 - Installer Maven et Java SDK 11
 - Vérifier le chemin et le port de la base de donnée et rectifier si nécessaire l'url dans le fichier main/resources/application.properties
-- Ouvrir un terminal dans pmb-backend
-- > mvn install
-- > java -jar "fichier .jar généré dans target"
+- Ouvrir un terminal dans pmb-backend :
+- > > mvn install
+- > > java -jar "fichier .jar généré dans target"
 
 -----------------------------------------
  Installation et lancement du frontend
 -----------------------------------------
 
-- Ouvrir un terminal dans pmb-frontend
-- > npm install
-- > npm run serve
+- Ouvrir un terminal dans pmb-frontend :
+- > > npm install
+- > > npm run serve
 
 Vous pouvez cliquer sur une des deux URL proposées et commencer les essais...
