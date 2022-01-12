@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">payMyBuddy</a> &gt; <a href="index.source.html" class="el_package">com.api.payMyBuddy.controller</a> &gt; <span class="el_source">AuthController.java</span></div><h1>AuthController.java</h1><pre class="source lang-java linenums">package com.api.payMyBuddy.controller;
+
+import com.api.payMyBuddy.exceptions.APIRuntimeException;
+import com.api.payMyBuddy.model.JwtResponse;
+import com.api.payMyBuddy.model.front.Login;
+import com.api.payMyBuddy.model.front.User;
+import com.api.payMyBuddy.security.jwt.JwtUtils;
+import com.api.payMyBuddy.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+
+/**
+ * Controls the authentication and registration of a user in Pay My Buddy
+ */
+@CrossOrigin(origins = &quot;*&quot;, maxAge = 3600)
+@RestController
+@RequestMapping(&quot;/api/auth&quot;)
+@RequiredArgsConstructor
+public class AuthController extends ValidationClass {
+
+    @Autowired
+    private final UserService userService;
+
+    @Autowired
+    private final AuthenticationManager authenticationManager;
+
+    @Autowired
+    private final JwtUtils jwtUtils;
+
+    /**
+     * Authenticates a user
+     *
+     * @param login : The email and password of the user to be authenticated
+     * @return Status OK, a token and the user's email if the operation succeeds, otherwise the reason for the failure
+     */
+    @PostMapping(&quot;/login&quot;)
+    public ResponseEntity&lt;?&gt; authenticateUser(@Valid @RequestBody Login login) {
+
+<span class="nc" id="L48">        Authentication authentication = authenticationManager.authenticate(</span>
+<span class="nc" id="L49">                new UsernamePasswordAuthenticationToken(login.getEmail(), login.getPassword()));</span>
+
+<span class="nc" id="L51">        SecurityContextHolder.getContext().setAuthentication(authentication);</span>
+<span class="nc" id="L52">        String jwt = jwtUtils.generateJwtToken(authentication);</span>
+
+<span class="nc" id="L54">        Login userDetails = (Login) authentication.getPrincipal();</span>
+
+<span class="nc" id="L56">        return ResponseEntity.ok(new JwtResponse(jwt,</span>
+<span class="nc" id="L57">                userDetails.getEmail()));</span>
+    }
+
+    /**
+     * Registers a user
+     *
+     * @param user : The user to be registered
+     * @return Status CREATED,&quot;User created&quot; if the operation succeeds, otherwise the reason for the failure
+     */
+    @PostMapping(&quot;/signup&quot;)
+    public ResponseEntity&lt;?&gt; registerUser(@RequestBody User user) {
+<span class="fc bfc" id="L68" title="All 2 branches covered.">        if (isNotValid(user)) {</span>
+<span class="fc" id="L69">            return new ResponseEntity&lt;&gt;(&quot;Error in request body&quot;, HttpStatus.BAD_REQUEST);</span>
+        } else {
+            try {
+<span class="fc" id="L72">                return userService.createUser(user);</span>
+<span class="fc" id="L73">            } catch (APIRuntimeException e) {</span>
+<span class="fc" id="L74">                return new ResponseEntity&lt;&gt;(e.getMessage(), e.getHttpStatus());</span>
+            }
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

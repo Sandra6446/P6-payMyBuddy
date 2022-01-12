@@ -132,7 +132,7 @@ VALUES
 
 INSERT INTO `transfert`(`utilisateur_email`,`destinataire_email`,`date`,`montant`,`description`)
 VALUES
-('sarah@email.com','myriam@email.com','2021-12-14 12:07:55',12,'Cadeaux de Noël'),
+('sarah@email.com','myriam@email.com','2021-12-14 12:07:55',12,'Cadeaux de Noel'),
 ('sarah@email.com','rachel@email.com','2022-01-03 09:51:54',21,'Restaurant'),
 ('rachel@email.com','sarah@email.com','2022-01-03 14:45:11',12,'Cinema'),
 ('thomas@email.com','sarah@email.com','2021-12-14 12:13:32',25,'Cadeaux');

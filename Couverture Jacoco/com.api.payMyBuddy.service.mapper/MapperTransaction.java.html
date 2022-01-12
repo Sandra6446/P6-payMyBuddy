@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MapperTransaction.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">payMyBuddy</a> &gt; <a href="index.source.html" class="el_package">com.api.payMyBuddy.service.mapper</a> &gt; <span class="el_source">MapperTransaction.java</span></div><h1>MapperTransaction.java</h1><pre class="source lang-java linenums">package com.api.payMyBuddy.service.mapper;
+
+import com.api.payMyBuddy.model.entity.TransactionEntity;
+import com.api.payMyBuddy.model.entity.UserEntity;
+import com.api.payMyBuddy.model.front.Transaction;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+/**
+ * Organizes user connection
+ */
+@Component
+<span class="fc" id="L16">public class MapperTransaction {</span>
+
+    /**
+     * Gets all transaction made by a user (debits), organized by date
+     *
+     * @param userEntity : The user entity containing the transaction list to be sorted
+     * @return A transaction list, sorted by date
+     */
+    public List&lt;Transaction&gt; getDebits(UserEntity userEntity) {
+<span class="fc" id="L25">        List&lt;Transaction&gt; debits = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L26" title="All 2 branches covered.">        for (TransactionEntity transactionEntity : userEntity.getDebits()) {</span>
+<span class="fc" id="L27">            Transaction transaction = new Transaction(transactionEntity, true);</span>
+<span class="fc" id="L28">            debits.add(transaction);</span>
+<span class="fc" id="L29">        }</span>
+<span class="fc" id="L30">        debits.sort(Comparator.comparing(Transaction::getDate).reversed());</span>
+<span class="fc" id="L31">        return debits;</span>
+    }
+
+    /**
+     * Gets all transaction of a user (debits and credits), organized by date
+     *
+     * @param userEntity : The user entity containing the transaction list to be sorted
+     * @return A transaction list, sorted by date
+     */
+    public List&lt;Transaction&gt; getAllTransactions(UserEntity userEntity) {
+<span class="fc" id="L41">        List&lt;Transaction&gt; transactions = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        for (TransactionEntity transactionEntity : userEntity.getCredits()) {</span>
+<span class="fc" id="L43">            transactions.add(new Transaction(transactionEntity, false));</span>
+<span class="fc" id="L44">        }</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">        for (TransactionEntity transactionEntity : userEntity.getDebits()) {</span>
+<span class="fc" id="L46">            transactions.add(new Transaction(transactionEntity, true));</span>
+<span class="fc" id="L47">        }</span>
+<span class="fc" id="L48">        transactions.sort(Comparator.comparing(Transaction::getDate).reversed());</span>
+<span class="fc" id="L49">        return transactions;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

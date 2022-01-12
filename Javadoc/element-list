@@ -1,0 +1,13 @@
+com.api.payMyBuddy
+com.api.payMyBuddy.config
+com.api.payMyBuddy.controller
+com.api.payMyBuddy.exceptions
+com.api.payMyBuddy.model
+com.api.payMyBuddy.model.entity
+com.api.payMyBuddy.model.front
+com.api.payMyBuddy.model.repository
+com.api.payMyBuddy.security
+com.api.payMyBuddy.security.jwt
+com.api.payMyBuddy.security.services
+com.api.payMyBuddy.service
+com.api.payMyBuddy.service.mapper

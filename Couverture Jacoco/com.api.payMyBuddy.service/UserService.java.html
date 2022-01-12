@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">payMyBuddy</a> &gt; <a href="index.source.html" class="el_package">com.api.payMyBuddy.service</a> &gt; <span class="el_source">UserService.java</span></div><h1>UserService.java</h1><pre class="source lang-java linenums">package com.api.payMyBuddy.service;
+
+import com.api.payMyBuddy.controller.UserController;
+import com.api.payMyBuddy.exceptions.AlreadyInDatabaseException;
+import com.api.payMyBuddy.exceptions.NotFoundInDatabaseException;
+import com.api.payMyBuddy.model.entity.UserEntity;
+import com.api.payMyBuddy.model.front.User;
+import com.api.payMyBuddy.model.repository.UserEntityRepository;
+import com.api.payMyBuddy.security.services.UserDetailsServiceImpl;
+import lombok.AllArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
+
+/**
+ * Manages user information
+ */
+@Service
+@AllArgsConstructor
+public class UserService {
+
+<span class="fc" id="L29">    private static final Logger logger = LogManager.getLogger(UserController.class);</span>
+
+    @Autowired
+    UserDetailsServiceImpl userDetailsService;
+
+    @Autowired
+    private UserEntityRepository userEntityRepository;
+
+    /**
+     * Registers a user
+     *
+     * @param user : The user to be registered
+     * @return Status CREATED,&quot;User created&quot; if the operation succeeds, otherwise the reason for the failure
+     */
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public ResponseEntity&lt;Object&gt; createUser(User user) throws RuntimeException {
+<span class="fc bfc" id="L45" title="All 2 branches covered.">        if (user.getConfirmPassword().isEmpty()) {</span>
+<span class="fc" id="L46">            logger.error(&quot;The two passwords are required&quot;);</span>
+<span class="fc" id="L47">            return new ResponseEntity&lt;&gt;(&quot;The two passwords are required&quot;, HttpStatus.BAD_REQUEST);</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        } else if (!user.getPassword().equals(user.getConfirmPassword())) {</span>
+<span class="fc" id="L49">            logger.error(&quot;The two passwords are different&quot;);</span>
+<span class="fc" id="L50">            return new ResponseEntity&lt;&gt;(&quot;The two passwords are different&quot;, HttpStatus.BAD_REQUEST);</span>
+        } else {
+<span class="fc" id="L52">            Optional&lt;UserEntity&gt; userEntityOptional = userEntityRepository.findByEmail(user.getEmail());</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">            if (userEntityOptional.isPresent()) {</span>
+<span class="fc" id="L54">                logger.error(String.format(&quot;User %s already in database&quot;, user.getEmail()));</span>
+<span class="fc" id="L55">                throw new AlreadyInDatabaseException(&quot;User already in database&quot;);</span>
+            } else {
+<span class="fc" id="L57">                UserEntity userEntity = new UserEntity(user);</span>
+<span class="fc" id="L58">                userEntity.setPassword(userDetailsService.encode(user.getPassword()));</span>
+<span class="fc" id="L59">                userEntityRepository.saveAndFlush(userEntity);</span>
+<span class="fc" id="L60">                logger.info(String.format(&quot;User created : %s&quot;, user));</span>
+<span class="fc" id="L61">                return new ResponseEntity&lt;&gt;(&quot;User created&quot;, HttpStatus.CREATED);</span>
+            }
+        }
+    }
+
+    /**
+     * Gets all user information
+     *
+     * @param email : The current user email
+     * @return Status OK, with user information if the operation succeeds, otherwise the reason of the failure
+     */
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
+    public ResponseEntity&lt;Object&gt; getUser(String email) throws RuntimeException {
+<span class="fc" id="L74">        Optional&lt;UserEntity&gt; userEntityOptional = userEntityRepository.findByEmail(email);</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">        if (userEntityOptional.isEmpty()) {</span>
+<span class="fc" id="L76">            logger.error(String.format(&quot;User %s not found&quot;, email));</span>
+<span class="fc" id="L77">            throw new NotFoundInDatabaseException(&quot;User not found&quot;);</span>
+        } else {
+<span class="fc" id="L79">            User user = new User(userEntityOptional.get());</span>
+<span class="fc" id="L80">            logger.info(user.toString());</span>
+<span class="fc" id="L81">            return ResponseEntity.ok(user);</span>
+        }
+    }
+
+    /**
+     * Updates user profile
+     *
+     * @param email : The current user email
+     * @param user  : The new profile
+     * @return Status OK, &quot;Profile updated&quot; if the operation succeeds, otherwise the reason of the failure
+     */
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public ResponseEntity&lt;Object&gt; updateUser(String email, User user) throws RuntimeException {
+<span class="fc bfc" id="L94" title="All 2 branches covered.">        if (user.getConfirmPassword().isEmpty()) {</span>
+<span class="fc" id="L95">            logger.error(&quot;Confirm password is required&quot;);</span>
+<span class="fc" id="L96">            return new ResponseEntity&lt;&gt;(&quot;Confirm password is required&quot;, HttpStatus.BAD_REQUEST);</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">        } else if (!user.getPassword().equals(user.getConfirmPassword())) {</span>
+<span class="fc" id="L98">            logger.error(&quot;The two passwords are different&quot;);</span>
+<span class="fc" id="L99">            return new ResponseEntity&lt;&gt;(&quot;The two passwords are different&quot;, HttpStatus.BAD_REQUEST);</span>
+        } else {
+<span class="fc bfc" id="L101" title="All 2 branches covered.">            if (!user.getEmail().equals(email)) {</span>
+<span class="fc" id="L102">                Optional&lt;UserEntity&gt; newUserOptional = userEntityRepository.findByEmail(user.getEmail());</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">                if (newUserOptional.isPresent()) {</span>
+<span class="fc" id="L104">                    logger.error(String.format(&quot;Email %s already in database&quot;, user.getEmail()));</span>
+<span class="fc" id="L105">                    throw new AlreadyInDatabaseException(&quot;New email not valid, please choose another email&quot;);</span>
+                }
+            }
+<span class="fc" id="L108">            Optional&lt;UserEntity&gt; userEntityOptional = userEntityRepository.findByEmail(email);</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">            if (userEntityOptional.isEmpty()) {</span>
+<span class="fc" id="L110">                logger.error(String.format(&quot;User %s not found&quot;, email));</span>
+<span class="fc" id="L111">                throw new NotFoundInDatabaseException(&quot;User not found&quot;);</span>
+            } else {
+<span class="fc" id="L113">                UserEntity userEntity = userEntityOptional.get();</span>
+<span class="fc" id="L114">                userEntity.update(user);</span>
+<span class="fc" id="L115">                userEntity.setPassword(userDetailsService.encode(user.getPassword()));</span>
+<span class="fc" id="L116">                userEntityRepository.saveAndFlush(userEntity);</span>
+<span class="fc" id="L117">                logger.info(String.format(&quot;User updated : %s&quot;, user));</span>
+<span class="fc" id="L118">                return ResponseEntity.ok(&quot;Profile updated&quot;);</span>
+            }
+        }
+    }
+
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

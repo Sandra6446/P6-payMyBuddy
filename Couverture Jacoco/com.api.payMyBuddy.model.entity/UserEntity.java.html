@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserEntity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">payMyBuddy</a> &gt; <a href="index.source.html" class="el_package">com.api.payMyBuddy.model.entity</a> &gt; <span class="el_source">UserEntity.java</span></div><h1>UserEntity.java</h1><pre class="source lang-java linenums">package com.api.payMyBuddy.model.entity;
+
+import com.api.payMyBuddy.model.front.User;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Represents a user entity in database
+ *
+ * @see User
+ */
+@Entity
+@Table(name = &quot;utilisateur&quot;)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@DynamicUpdate
+public class UserEntity implements Serializable {
+
+    /**
+     * The user Id
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = &quot;id&quot;)
+    private int id;
+
+    /**
+     * The user entity email, unique
+     */
+    @NotNull
+    private String email;
+
+    /**
+     * The user entity first name
+     */
+    @Column(name = &quot;prenom&quot;)
+    private String firstName;
+
+    /**
+     * The user entity last name
+     */
+    @Column(name = &quot;nom&quot;)
+    private String lastName;
+
+    /**
+     * The user entity password
+     */
+    @Column(name = &quot;mot_de_passe&quot;)
+    private String password;
+
+    /**
+     * The user entity balance in the application
+     */
+    @Column(name = &quot;solde&quot;)
+    private double balance;
+
+    /**
+     * The user entity bank name
+     */
+    @Column(name = &quot;banque&quot;)
+    private String bank;
+
+    /**
+     * The user entity account iban
+     */
+    private String iban;
+
+    /**
+     * The user entity bank account bic
+     */
+    private String bic;
+
+    /**
+     * The user entity contacts list
+     */
+<span class="fc" id="L85">    @OneToMany(mappedBy = &quot;connectionPrimaryKey.userEntity&quot;)</span>
+    private List&lt;ConnectionEntity&gt; connectionEntities = new ArrayList&lt;&gt;();
+
+    /**
+     * The user entity debits list
+     */
+<span class="fc" id="L91">    @OneToMany(mappedBy = &quot;transferPrimaryKey.userEntity&quot;)</span>
+    private List&lt;TransactionEntity&gt; debits = new ArrayList&lt;&gt;();
+
+    /**
+     * The user entity credits list
+     */
+<span class="fc" id="L97">    @OneToMany(mappedBy = &quot;transferPrimaryKey.contactEntity&quot;)</span>
+    private List&lt;TransactionEntity&gt; credits = new ArrayList&lt;&gt;();
+
+<span class="fc" id="L100">    public UserEntity(User user) {</span>
+<span class="fc" id="L101">        this.setEmail(user.getEmail());</span>
+<span class="fc" id="L102">        this.setFirstName(user.getFirstName());</span>
+<span class="fc" id="L103">        this.setLastName(user.getLastName());</span>
+<span class="fc" id="L104">        this.setBank(user.getBankAccount().getBank());</span>
+<span class="fc" id="L105">        this.setBic(user.getBankAccount().getBic());</span>
+<span class="fc" id="L106">        this.setIban(user.getBankAccount().getIban());</span>
+<span class="fc" id="L107">    }</span>
+
+    /**
+     * Updates the user profile
+     *
+     * @param user : The new profile to be registered
+     */
+    public void update(User user) {
+<span class="fc bfc" id="L115" title="All 2 branches covered.">        if (!user.getEmail().isEmpty()) {</span>
+<span class="fc" id="L116">            this.setEmail(user.getEmail());</span>
+        }
+<span class="fc bfc" id="L118" title="All 2 branches covered.">        if (!user.getFirstName().isEmpty()) {</span>
+<span class="fc" id="L119">            this.setFirstName(user.getFirstName());</span>
+        }
+<span class="fc bfc" id="L121" title="All 2 branches covered.">        if (!user.getLastName().isEmpty()) {</span>
+<span class="fc" id="L122">            this.setLastName(user.getLastName());</span>
+        }
+<span class="fc bfc" id="L124" title="All 2 branches covered.">        if (!user.getBankAccount().getBank().isEmpty()) {</span>
+<span class="fc" id="L125">            this.setBank(user.getBankAccount().getBank());</span>
+        }
+<span class="fc bfc" id="L127" title="All 2 branches covered.">        if (!user.getBankAccount().getIban().isEmpty()) {</span>
+<span class="fc" id="L128">            this.setIban(user.getBankAccount().getIban());</span>
+        }
+<span class="fc bfc" id="L130" title="All 2 branches covered.">        if (!user.getBankAccount().getBic().isEmpty()) {</span>
+<span class="fc" id="L131">            this.setBic(user.getBankAccount().getBic());</span>
+        }
+<span class="fc" id="L133">    }</span>
+
+    /**
+     * Updates the user balance
+     *
+     * @param amount : The amount to be added
+     */
+    public void updateBalance(int amount) {
+<span class="fc" id="L141">        double newAmount = this.getBalance() + amount;</span>
+<span class="fc" id="L142">        this.setBalance(newAmount);</span>
+<span class="fc" id="L143">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

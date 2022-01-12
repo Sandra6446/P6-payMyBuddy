@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TransactionController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">payMyBuddy</a> &gt; <a href="index.source.html" class="el_package">com.api.payMyBuddy.controller</a> &gt; <span class="el_source">TransactionController.java</span></div><h1>TransactionController.java</h1><pre class="source lang-java linenums">package com.api.payMyBuddy.controller;
+
+import com.api.payMyBuddy.exceptions.APIRuntimeException;
+import com.api.payMyBuddy.model.front.Transaction;
+import com.api.payMyBuddy.service.TransactionService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * Collects and updates information about a user transactions
+ */
+@CrossOrigin(origins = &quot;*&quot;, maxAge = 3600)
+@RestController
+@RequestMapping(&quot;/api/transaction&quot;)
+@RequiredArgsConstructor
+public class TransactionController extends ValidationClass {
+
+    @Autowired
+    private final TransactionService transactionService;
+
+    /**
+     * Gets all the transactions of a user
+     *
+     * @param email : The current user email
+     * @return Status OK, with the transaction list if the operation succeeds, otherwise the reason of the failure
+     */
+    @ApiOperation(value = &quot;Gets all transactions of a user&quot;, authorizations = {@Authorization(value = &quot;jwtToken&quot;)})
+    @GetMapping(&quot;/{email}&quot;)
+    public ResponseEntity&lt;?&gt; getAllTransactions(@PathVariable String email) {
+<span class="fc bfc" id="L35" title="All 2 branches covered.">        if (isEmpty(email)) {</span>
+<span class="fc" id="L36">            return new ResponseEntity&lt;&gt;(&quot;Error in request body&quot;, HttpStatus.BAD_REQUEST);</span>
+        } else {
+            try {
+<span class="fc" id="L39">                return transactionService.getAllTransactions(email);</span>
+<span class="fc" id="L40">            } catch (APIRuntimeException e) {</span>
+<span class="fc" id="L41">                return new ResponseEntity&lt;&gt;(e.getMessage(), e.getHttpStatus());</span>
+            }
+        }
+    }
+
+    /**
+     * Gets transactions made by a user
+     *
+     * @param email : The current user email
+     * @return Status OK, with the transaction list if the operation succeeds, otherwise the reason of the failure
+     */
+    @ApiOperation(value = &quot;Gets transactions made by a user&quot;, authorizations = {@Authorization(value = &quot;jwtToken&quot;)})
+    @GetMapping(&quot;/{email}/myTransactions&quot;)
+    public ResponseEntity&lt;?&gt; getMyTransactions(@PathVariable String email) {
+<span class="fc bfc" id="L55" title="All 2 branches covered.">        if (isEmpty(email)) {</span>
+<span class="fc" id="L56">            return new ResponseEntity&lt;&gt;(&quot;Error in request body&quot;, HttpStatus.BAD_REQUEST);</span>
+        } else {
+            try {
+<span class="fc" id="L59">                return transactionService.getMyTransactions(email);</span>
+<span class="fc" id="L60">            } catch (APIRuntimeException e) {</span>
+<span class="fc" id="L61">                return new ResponseEntity&lt;&gt;(e.getMessage(), e.getHttpStatus());</span>
+            }
+        }
+    }
+
+    /**
+     * Adds a transaction
+     *
+     * @param transaction : the transaction to be added
+     * @return Status CREATED, &quot;Transaction added&quot; if the operation succeeds, otherwise the reason of the failure
+     */
+    @ApiOperation(value = &quot;Adds a transaction for a user&quot;, authorizations = {@Authorization(value = &quot;jwtToken&quot;)})
+    @PostMapping
+    public ResponseEntity&lt;?&gt; addTransaction(@RequestBody Transaction transaction) {
+<span class="fc bfc" id="L75" title="All 2 branches covered.">        if (isNotValid(transaction)) {</span>
+<span class="fc" id="L76">            return new ResponseEntity&lt;&gt;(&quot;Error in request body&quot;, HttpStatus.BAD_REQUEST);</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        } else if (transaction.getUserEmail().equals(transaction.getConnectionEmail())) {</span>
+<span class="fc" id="L78">            return new ResponseEntity&lt;&gt;(&quot;Emails have to be different&quot;, HttpStatus.BAD_REQUEST);</span>
+        } else {
+            try {
+<span class="fc" id="L81">                return transactionService.createTransaction(transaction);</span>
+<span class="fc" id="L82">            } catch (APIRuntimeException e) {</span>
+<span class="fc" id="L83">                return new ResponseEntity&lt;&gt;(e.getMessage(), e.getHttpStatus());</span>
+            }
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ConnectionController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">payMyBuddy</a> &gt; <a href="index.source.html" class="el_package">com.api.payMyBuddy.controller</a> &gt; <span class="el_source">ConnectionController.java</span></div><h1>ConnectionController.java</h1><pre class="source lang-java linenums">package com.api.payMyBuddy.controller;
+
+import com.api.payMyBuddy.exceptions.APIRuntimeException;
+import com.api.payMyBuddy.model.front.Connection;
+import com.api.payMyBuddy.service.ConnectionService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * Collects and updates information about a user connections
+ */
+@CrossOrigin(origins = &quot;*&quot;, maxAge = 3600)
+@RestController
+@RequestMapping(&quot;/api/connection&quot;)
+@RequiredArgsConstructor
+public class ConnectionController extends ValidationClass {
+
+    @Autowired
+    private final ConnectionService connectionService;
+
+    /**
+     * Adds a contact
+     *
+     * @param connection : The contact to create
+     * @return Status CREATED,&quot;Connection added&quot; if the operation succeeds, otherwise the reason of the failure
+     */
+    @ApiOperation(value = &quot;Adds connection in database&quot;, authorizations = {@Authorization(value = &quot;jwtToken&quot;)})
+    @PostMapping
+    public ResponseEntity&lt;?&gt; addConnection(@RequestBody Connection connection) {
+<span class="pc bpc" id="L35" title="1 of 4 branches missed.">        if (isNotValid(connection) || connection.getUserEmail().equals(connection.getConnectionEmail())) {</span>
+<span class="fc" id="L36">            return new ResponseEntity&lt;&gt;(&quot;Error in request body&quot;, HttpStatus.BAD_REQUEST);</span>
+        } else {
+            try {
+<span class="fc" id="L39">                return connectionService.createConnection(connection);</span>
+<span class="fc" id="L40">            } catch (APIRuntimeException e) {</span>
+<span class="fc" id="L41">                return new ResponseEntity&lt;&gt;(e.getMessage(), e.getHttpStatus());</span>
+            }
+        }
+    }
+
+    /**
+     * Gets the contact list of current user
+     *
+     * @param email : The current user email
+     * @return Status OK, with the contact list if the operation succeeds, otherwise the reason of the failure
+     */
+    @ApiOperation(value = &quot;Gets connections of a user&quot;, authorizations = {@Authorization(value = &quot;jwtToken&quot;)})
+    @GetMapping(&quot;/{email}&quot;)
+    public ResponseEntity&lt;?&gt; getConnections(@PathVariable String email) {
+<span class="fc bfc" id="L55" title="All 2 branches covered.">        if (isEmpty(email)) {</span>
+<span class="fc" id="L56">            return new ResponseEntity&lt;&gt;(&quot;Error in request body&quot;, HttpStatus.BAD_REQUEST);</span>
+        } else {
+            try {
+<span class="fc" id="L59">                return connectionService.getConnections(email);</span>
+<span class="fc" id="L60">            } catch (APIRuntimeException e) {</span>
+<span class="fc" id="L61">                return new ResponseEntity&lt;&gt;(e.getMessage(), e.getHttpStatus());</span>
+            }
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

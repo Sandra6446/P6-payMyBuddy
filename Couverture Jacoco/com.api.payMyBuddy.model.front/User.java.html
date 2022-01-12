@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>User.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">payMyBuddy</a> &gt; <a href="index.source.html" class="el_package">com.api.payMyBuddy.model.front</a> &gt; <span class="el_source">User.java</span></div><h1>User.java</h1><pre class="source lang-java linenums">package com.api.payMyBuddy.model.front;
+
+import com.api.payMyBuddy.model.entity.UserEntity;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.util.StringJoiner;
+
+/**
+ * Represents a user
+ *
+ * @see Login
+ * @see UserEntity
+ */
+@Data
+@NoArgsConstructor
+public class User extends Login {
+
+    /**
+     * The user first name
+     */
+    @NotNull
+    @NotEmpty
+    private String firstName;
+
+    /**
+     * The user last name
+     */
+    @NotNull
+    @NotEmpty
+    private String lastName;
+
+    /**
+     * The user balance in the application
+     */
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private double balance;
+
+    /**
+     * The user bank account
+     */
+    @NotNull
+    @Valid
+    private BankAccount bankAccount;
+
+<span class="fc" id="L50">    public User(UserEntity userEntity) {</span>
+<span class="fc" id="L51">        this.setEmail(userEntity.getEmail());</span>
+<span class="fc" id="L52">        this.setPassword(userEntity.getPassword());</span>
+<span class="fc" id="L53">        this.setFirstName(userEntity.getFirstName());</span>
+<span class="fc" id="L54">        this.setLastName(userEntity.getLastName());</span>
+<span class="fc" id="L55">        this.setBalance(userEntity.getBalance());</span>
+<span class="fc" id="L56">        this.setBankAccount(new BankAccount(userEntity.getBank(), userEntity.getIban(), userEntity.getBic()));</span>
+<span class="fc" id="L57">    }</span>
+
+    public User(@NotNull @NotEmpty String email, @NotNull @NotEmpty String password, String confirmPassword, String firstName, String lastName, double balance, BankAccount bankAccount) {
+<span class="fc" id="L60">        super(email, password, confirmPassword);</span>
+<span class="fc" id="L61">        this.firstName = firstName;</span>
+<span class="fc" id="L62">        this.lastName = lastName;</span>
+<span class="fc" id="L63">        this.balance = balance;</span>
+<span class="fc" id="L64">        this.bankAccount = bankAccount;</span>
+<span class="fc" id="L65">    }</span>
+
+    @Override
+    public String toString() {
+<span class="fc" id="L69">        return new StringJoiner(&quot;, &quot;, &quot;&quot; + &quot;{&quot;, &quot;}&quot;)</span>
+<span class="fc" id="L70">                .add(&quot;\&quot;email\&quot;:\&quot;&quot; + email + &quot;\&quot;&quot;)</span>
+<span class="fc" id="L71">                .add(&quot;\&quot;password\&quot;:\&quot;&quot; + password + &quot;\&quot;&quot;)</span>
+<span class="fc" id="L72">                .add(&quot;\&quot;confirmPassword\&quot;:\&quot;&quot; + confirmPassword + &quot;\&quot;&quot;)</span>
+<span class="fc" id="L73">                .add(&quot;\&quot;firstName\&quot;:\&quot;&quot; + firstName + &quot;\&quot;&quot;)</span>
+<span class="fc" id="L74">                .add(&quot;\&quot;lastName\&quot;:\&quot;&quot; + lastName + &quot;\&quot;&quot;)</span>
+<span class="fc" id="L75">                .add(&quot;\&quot;balance\&quot;:&quot; + balance)</span>
+<span class="fc" id="L76">                .add(&quot;\&quot;bankAccount\&quot;:&quot; + bankAccount)</span>
+<span class="fc" id="L77">                .toString();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
