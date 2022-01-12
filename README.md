@@ -9,12 +9,14 @@ Ce repo contient :
 - Le document Etude et Conception : qui contient le MPD et l'étude préparatoire au projet
 
 -----------------------------------------
--- Préparation de la base de donnée MySQL
+ Préparation de la base de donnée MySQL
 -----------------------------------------
 
 - Installer MySQL Server
 - Se connecter sur le compte admin
-- Lancer le script ScriptCreationDatabase.sql à l'aide de la commande > source "chemin du script"
+- Lancer le script ScriptCreationDatabase.sql à l'aide de la commande :
+    > source "chemin du script"
+    
     Le script déclenche :
     * Suppression de la base pay_my_buddy si elle a déjà été créée
     * Création d'une nouvelle base pay_my_buddy
@@ -27,7 +29,7 @@ Ce repo contient :
         mail : rachel@email.com / mdp rachel
 
 -----------------------------------------
--- Installation et lancement du backend
+ Installation et lancement du backend
 -----------------------------------------
 
 - Installer Maven et Java SDK 11
@@ -37,7 +39,7 @@ Ce repo contient :
 - > java -jar "fichier .jar généré dans target"
 
 -----------------------------------------
--- Installation et lancement du frontend
+ Installation et lancement du frontend
 -----------------------------------------
 
 - Ouvrir un terminal dans pmb-frontend
